@@ -35,3 +35,5 @@ flutter:
     - family: Lexend
       fonts:
         - asset: assets/Lexend-VariableFont_wght.ttf
+  assets:
+    - assets/voltraLogo.png

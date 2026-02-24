@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 
-class CustomAppBar extends StatefulWidget {
+class CustomAppBar extends StatelessWidget {
   final String userName;
 
   const CustomAppBar({super.key, required this.userName});
 
   @override
-  State<CustomAppBar> createState() => _CustomAppBarState();
-}
-
-class _CustomAppBarState extends State<CustomAppBar> {
-  @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       decoration: const BoxDecoration(
-        color: Color(0xFF101922),
+        color: Color(0xFF0053C8),
         border: Border(
           bottom: BorderSide(
             color: Color(0xFF000000),
@@ -24,15 +19,22 @@ class _CustomAppBarState extends State<CustomAppBar> {
         ),
       ),
       child: SafeArea(
-        child:Row(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              widget.userName,
+              userName,
               style: const TextStyle(
-                color: Color(0xFF0053C8),
+                color: Color(0xFFFFFFFF),
                 fontSize: 22,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w900,
               ),
+            ),
+            const SizedBox(width: 10),
+            Image.asset(
+              'assets/voltraLogo.png',
+              width: 60,
+              height: 60,
             ),
           ],
         ),

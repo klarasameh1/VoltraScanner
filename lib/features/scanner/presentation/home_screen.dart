@@ -10,7 +10,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
         body: Column(
             children: [
-              const CustomAppBar(userName: 'Voltra'),
+              const CustomAppBar(userName: 'Voltra Scanner'),
               const SizedBox(height: 100,),
               Center(
                 child: ElevatedButton(
