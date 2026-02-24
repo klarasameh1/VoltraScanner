@@ -1,46 +1,56 @@
-import 'package:event_scanner_app/features/scanner/presentation/scanner_screen.dart';
 import 'package:event_scanner_app/features/scanner/presentation/widgets/app_bar.dart';
+import 'package:event_scanner_app/features/scanner/presentation/widgets/eventsList.dart';
+import 'package:event_scanner_app/features/scanner/presentation/widgets/scanner_button.dart';
 import 'package:flutter/material.dart';
 
+import '../../../models/event.dart';
+
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+   HomeScreen({super.key});
+
+///Dummy Data till Api is ready
+  List<Event> upcomingEvents = [
+    Event(id: 1, name: 'BMB Event', date: '2026-03-10', time: '4:00 pm'),
+    Event(id: 2, name: 'Find your Fit', date: '2026-03-15', time: '5:00 pm'),
+    Event(id: 3, name: 'Coding Competition', date: '2026-03-20', time: '6:30 pm'),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-            children: [
-              const CustomAppBar(userName: 'Voltra Scanner'),
-              const SizedBox(height: 100,),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const QRScannerScreen()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF0053C8),
-                    foregroundColor: Colors.white,
-                    shadowColor: Colors.black,
-                    elevation: 5,
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      side: const BorderSide(color: Colors.white, width: 2),
+      backgroundColor: const Color(0xFF101922),
+      body: Column(
+        children: [
+          const CustomAppBar(userName: 'Voltra Scanner'),
+          const SizedBox(height: 40),
+          ScannerButton(),
+          const SizedBox(height: 30),
+
+          // Title
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Upcoming Events',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
-                  child: const Text(
-                    "Open Scanner",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: EventsList(events: upcomingEvents)
                   ),
-                )
+                ],
               ),
-
-            ]
-        )
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
