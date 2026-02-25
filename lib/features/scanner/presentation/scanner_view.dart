@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
@@ -9,34 +9,28 @@ class ScannerScreen extends StatefulWidget {
 }
 
 class _ScannerScreenState extends State<ScannerScreen> {
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  QRViewController? controller;
+  bool scanned = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("QR Scanner")),
-      body: QRView(
-        key: qrKey,
-        onQRViewCreated: _onQRViewCreated,
+      body: MobileScanner(
+        controller: MobileScannerController(
+          detectionSpeed: DetectionSpeed.normal,
+        ),
+        onDetect: (capture) {
+          if (scanned) return;
+
+          final barcode = capture.barcodes.first;
+          final String? code = barcode.rawValue;
+
+          if (code != null) {
+            scanned = true;
+            Navigator.pop(context, code);
+          }
+        },
       ),
     );
-  }
-
-  void _onQRViewCreated(QRViewController controller) {
-    this.controller = controller;
-
-    controller.scannedDataStream.listen((scanData) {
-      controller.pauseCamera(); // يوقف بعد أول قراءة
-
-      Navigator.pop(context, scanData.code);
-      // يرجع القيمة للشاشة اللي فاتت
-    });
-  }
-
-  @override
-  void dispose() {
-    controller?.dispose();
-    super.dispose();
   }
 }

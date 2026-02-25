@@ -17,13 +17,11 @@ dependencies:
   # HTTP client for API requests
   dio: ^5.9.1
 
-  # QR Scanner (add later if needed)
-#  mobile_scanner: ^3.0.0
-#  qr_scanner_web: ^0.0.9
-#  qrcode_scanner_dialog: ^1.0.0
+  # QR Scanner
+  mobile_scanner: ^3.0.0
+
   # Optional UI helpers
   cupertino_icons: ^1.0.5
-  qr_code_scanner_plus: ^2.1.1
 
 dev_dependencies:
   flutter_test:
