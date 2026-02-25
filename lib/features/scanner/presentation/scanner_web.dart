@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:html' as html;
 import 'dart:ui' as ui;
 import 'dart:typed_data';
@@ -17,39 +16,43 @@ class _UniversalQRScannerState extends State<UniversalQRScanner> {
   html.VideoElement? _video;
   html.CanvasElement? _canvas;
   bool scanned = false;
-  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _setupWebCamera();
+    if (kIsWeb) _setupWebCamera();
   }
 
   void _setupWebCamera() async {
-    _video = html.VideoElement();
-    _video!.autoplay = true;
-    _video!.style.width = '100%';
-    _video!.style.height = '100%';
+    _video = html.VideoElement()
+      ..autoplay = true
+      ..style.width = '100%'
+      ..style.height = '100%';
     _canvas = html.CanvasElement();
 
-    try {
-      final stream = await html.window.navigator.mediaDevices!
-          .getUserMedia({'video': {'facingMode': 'environment'}});
-      _video!.srcObject = stream;
-    } catch (e) {
-      print("Camera access denied: $e");
+    final stream = await html.window.navigator.mediaDevices!
+        .getUserMedia({'video': {'facingMode': 'environment'}});
+    _video!.srcObject = stream;
+
+    // فقط لو Web
+    if (kIsWeb) {
+      // ignore: undefined_prefixed_name
+      ui.platformViewRegistry.registerViewFactory(
+        'webcamElement',
+            (int viewId) => _video!,
+      );
     }
 
-    // تسجيل VideoElement في Flutter Web
-    // ignore: undefined_prefixed_name
-    ui.platformViewRegistry.registerViewFactory('webcamElement', (int viewId) => _video!);
-
-    // بدء loop لفحص QR كل 300ms
-    _timer = Timer.periodic(const Duration(milliseconds: 300), (_) => _scanFrame());
+    Future.doWhile(() async {
+      if (scanned) return false;
+      await Future.delayed(const Duration(milliseconds: 300));
+      _scanFrame();
+      return true;
+    });
   }
 
   void _scanFrame() {
-    if (scanned || _video == null || _video!.videoWidth == 0) return;
+    if (_video == null || _video!.videoWidth == 0) return;
 
     _canvas!
       ..width = _video!.videoWidth
@@ -61,22 +64,15 @@ class _UniversalQRScannerState extends State<UniversalQRScanner> {
     final imgData = ctx.getImageData(0, 0, _canvas!.width!, _canvas!.height!);
     final code = jsQR(Uint8ClampedList.fromList(imgData.data), imgData.width!, imgData.height!);
 
-    if (code != null) {
+    if (code != null && !scanned) {
       scanned = true;
-      _timer?.cancel();
       Navigator.pop(context, code.data);
     }
   }
 
   @override
-  void dispose() {
-    _timer?.cancel();
-    _video?.srcObject?.getTracks().forEach((track) => track.stop());
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    if (!kIsWeb) return const SizedBox(); // Native doesn't use this file
     return Scaffold(
       appBar: AppBar(title: const Text("QR Scanner Web")),
       body: HtmlElementView(viewType: 'webcamElement'),

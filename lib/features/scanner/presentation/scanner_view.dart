@@ -1,1 +1,2 @@
-export 'scanner_native.dart' if (dart.library.html) 'scanner_web.dart';
+export 'scanner_native.dart'
+      if (dart.library.html) 'scanner_web.dart';

@@ -3,7 +3,6 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 class UniversalQRScanner extends StatefulWidget {
   const UniversalQRScanner({super.key});
-
   @override
   State<UniversalQRScanner> createState() => _UniversalQRScannerState();
 }
