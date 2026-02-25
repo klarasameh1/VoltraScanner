@@ -1,4 +1,4 @@
-import 'package:event_scanner_app/features/scanner/presentation/scanner_view.dart';
+import 'package:event_scanner_app/features/scanner/presentation/scanner_native.dart';
 import 'package:flutter/material.dart';
 
 class ScannerButton extends StatefulWidget {
