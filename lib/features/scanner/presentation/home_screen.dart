@@ -23,7 +23,7 @@ class HomeScreen extends StatelessWidget {
           const CustomAppBar(userName: 'Voltra Scanner'),
           const SizedBox(height: 40),
           ScannerButton(),
-          const SizedBox(height: 30),
+          const SizedBox(height: 40),
 
           // Title
           Expanded(
