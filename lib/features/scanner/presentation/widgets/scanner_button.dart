@@ -29,7 +29,10 @@ class _ScannerButtonState extends State<ScannerButton> {
       ),
       child: const Column(
         children: [
-          Icon(Icons.qr_code_scanner , size: 35,),
+          Icon(
+            Icons.qr_code_scanner,
+            size: 35,
+          ),
           Text(
             "Open Scanner",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
