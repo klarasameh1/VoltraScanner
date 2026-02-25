@@ -1,5 +1,6 @@
+import 'package:event_scanner_app/features/scanner/presentation/scanner_view.dart';
 import 'package:flutter/material.dart';
-import '../scanner_screen.dart';
+
 
 class ScannerButton extends StatefulWidget {
   const ScannerButton({super.key});
@@ -14,7 +15,7 @@ class _ScannerButtonState extends State<ScannerButton> {
       onPressed: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const QRScannerScreen()),
+          MaterialPageRoute(builder: (context) =>const ScannerScreen())
         );
       },
       style: ElevatedButton.styleFrom(

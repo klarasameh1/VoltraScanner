@@ -1,9 +1,8 @@
 import 'package:event_scanner_app/features/scanner/presentation/widgets/app_bar.dart';
 import 'package:event_scanner_app/features/scanner/presentation/widgets/eventsList.dart';
 import 'package:event_scanner_app/features/scanner/presentation/widgets/scanner_button.dart';
+import 'package:event_scanner_app/models/event.dart';
 import 'package:flutter/material.dart';
-
-import '../../../models/event.dart';
 
 class HomeScreen extends StatelessWidget {
    HomeScreen({super.key});
