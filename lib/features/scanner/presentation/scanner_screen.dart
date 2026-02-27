@@ -35,17 +35,22 @@ class _ScannerScreenState extends State<ScannerScreen> {
       // 🔊 Play Sound
       await audioPlayer.stop();
       if (success) {
-        await audioPlayer.play(AssetSource('sounds/success.mp3'));
+        await audioPlayer.play(
+          AssetSource('sounds/success.mp3'),
+        );
       } else {
-        await audioPlayer.play(AssetSource('sounds/error.mp3'));
+        await audioPlayer.play(
+          AssetSource('sounds/error.mp3'),
+        );
       }
 
-      // 🌫️ Show overlay
+      // 🟢 Show Result Overlay
       setState(() {
         scanSuccess = success;
-        resultMessage = result["message"] ?? "Invalid QR";
+        resultMessage = result["message"] ?? "";
       });
 
+      // ⏳ Wait 2 seconds
       await Future.delayed(const Duration(seconds: 2));
 
       // 🔄 Reset
@@ -56,15 +61,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
       await controller.start();
     } catch (e) {
-      debugPrint("Scan error: $e");
-      // لو فيه error خلي الكاميرا ترجع تشتغل
-      setState(() {
-        scanned = false;
-        isLoading = false;
-        scanSuccess = false;
-        resultMessage = "Scan failed, try again";
-      });
-      await controller.start();
+      debugPrint(e.toString());
     }
 
     setState(() => isLoading = false);
