@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 class HomeScreen extends StatelessWidget {
    HomeScreen({super.key});
 
-///Dummy Data till Api is ready
+/// Dummy Data till Api is ready
   List<Event> upcomingEvents = [
     Event(id: 1, name: 'BMB Event', date: '2026-03-10', time: '4:00 pm'),
     Event(id: 2, name: 'Find your Fit', date: '2026-03-15', time: '5:00 pm'),
