@@ -23,6 +23,8 @@ dependencies:
   # Optional UI helpers
   cupertino_icons: ^1.0.5
 
+  audioplayers: ^6.5.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -37,3 +39,4 @@ flutter:
         - asset: assets/Lexend-VariableFont_wght.ttf
   assets:
     - assets/voltraLogo.png
+    - assets/sounds/

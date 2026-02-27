@@ -1,6 +1,8 @@
+import 'package:event_scanner_app/features/scanner/presentation/scan_result_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../checkin_service.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
@@ -12,6 +14,7 @@ class ScannerScreen extends StatefulWidget {
 class _ScannerScreenState extends State<ScannerScreen> {
   final MobileScannerController controller = MobileScannerController();
   final CheckinService service = CheckinService();
+  final AudioPlayer audioPlayer = AudioPlayer();
 
   bool isLoading = false;
   bool scanned = false;
@@ -27,31 +30,25 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
       bool success = result["status"] == "success";
 
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          backgroundColor: success ? Colors.green : Colors.red,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+      if (success) {
+        await audioPlayer.play(AssetSource('sounds/success.mp3'));
+      } else {
+        await audioPlayer.play(AssetSource('sounds/error.mp3'));
+      }
+
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ScanResultScreen(
+            success: success,
+            message: result["message"] ?? "",
           ),
-          title: Text(
-            result["message"]!,
-            style: const TextStyle(color: Colors.white),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                resetScanner();
-              },
-              child: const Text(
-                "OK",
-                style: TextStyle(color: Colors.white),
-              ),
-            )
-          ],
         ),
       );
+
+      resetScanner();
     } catch (e) {
       debugPrint(e.toString());
     }
