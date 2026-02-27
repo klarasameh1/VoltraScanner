@@ -12,6 +12,9 @@ class HomeScreen extends StatelessWidget {
     Event(id: 1, name: 'BMB Event', date: '2026-03-10', time: '4:00 pm'),
     Event(id: 2, name: 'Find your Fit', date: '2026-03-15', time: '5:00 pm'),
     Event(id: 3, name: 'Coding Competition', date: '2026-03-20', time: '6:30 pm'),
+    Event(id: 4, name: 'BMB Event', date: '2026-03-10', time: '4:00 pm'),
+    Event(id: 5, name: 'Find your Fit', date: '2026-03-15', time: '5:00 pm'),
+    Event(id: 6, name: 'Coding Competition', date: '2026-03-20', time: '6:30 pm'),
   ];
 
   @override
@@ -44,6 +47,7 @@ class HomeScreen extends StatelessWidget {
                         color: Color(0xffffd700),
                       ),
                     ),
+                    SizedBox(height: 10,),
                     Expanded(child: EventsList(events:upcomingEvents))
                   ],
                 ),
