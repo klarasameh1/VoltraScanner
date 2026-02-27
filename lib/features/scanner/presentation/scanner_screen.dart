@@ -38,7 +38,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
       if (!mounted) return;
 
-      Navigator.push(
+      await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => ScanResultScreen(
@@ -48,7 +48,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
         ),
       );
 
-      resetScanner();
+      scanned = false;
+      await controller.start();
+
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -74,13 +76,16 @@ class _ScannerScreenState extends State<ScannerScreen> {
         children: [
           MobileScanner(
             controller: controller,
-            onDetect: (capture) {
+            onDetect: (capture) async {
               if (scanned) return;
+
               final barcode = capture.barcodes.first;
               final code = barcode.rawValue;
+
               if (code != null) {
-                controller.stop();
-                handleScan(code);
+                scanned = true;
+                await controller.stop();
+                await handleScan(code);
               }
             },
           ),
