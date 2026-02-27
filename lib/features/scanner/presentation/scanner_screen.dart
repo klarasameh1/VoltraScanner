@@ -18,61 +18,47 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
   bool isLoading = false;
   bool scanned = false;
-  bool? scanSuccess; // null = no result
+  bool? scanSuccess;
   String resultMessage = "";
 
   Future<void> handleScan(String token) async {
-    if (scanned) return;
-
-    setState(() {
-      isLoading = true;
-      scanned = true;
-    });
+    setState(() => isLoading = true);
 
     try {
       final result = await service.verifyToken(token);
       bool success = result["status"] == "success";
 
-      // Play success/error sound
       await audioPlayer.stop();
       await audioPlayer.play(
-        AssetSource(success ? 'sounds/success.mp3' : 'sounds/error.mp3'),
+        AssetSource(success ? 'sounds/success.mp3' : 'sounds/failed.mp3'),
       );
 
-      // Show overlay
       if (!mounted) return;
       setState(() {
         scanSuccess = success;
         resultMessage = result["message"] ?? (success ? "Success" : "Failed");
       });
 
-      // Wait so user sees overlay
       await Future.delayed(const Duration(seconds: 2));
 
-      // Reset overlay and scanner
       if (!mounted) return;
       setState(() {
         scanSuccess = null;
         scanned = false;
       });
-
-      await controller.start();
     } catch (e) {
       debugPrint("Scan error: $e");
-
       if (!mounted) return;
       setState(() {
         scanSuccess = false;
         resultMessage = "Error scanning QR";
         scanned = false;
       });
-      await controller.start();
     }
 
     if (mounted) setState(() => isLoading = false);
   }
 
-  /// Reset scanner manually
   void resetScanner() async {
     scanned = false;
     await controller.start();
@@ -97,22 +83,18 @@ class _ScannerScreenState extends State<ScannerScreen> {
       ),
       body: Stack(
         children: [
-          /// Camera feed
           MobileScanner(
             controller: controller,
-            onDetect: (capture) async {
+            onDetect: (capture) {
               if (scanned) return;
               final barcode = capture.barcodes.first;
               final code = barcode.rawValue;
               if (code != null) {
                 scanned = true;
-                await controller.stop();
-                await handleScan(code);
+                handleScan(code);
               }
             },
           ),
-
-          /// Scanner frame
           Center(
             child: Container(
               width: 250,
@@ -123,14 +105,10 @@ class _ScannerScreenState extends State<ScannerScreen> {
               ),
             ),
           ),
-
-          /// Loading spinner
           if (isLoading)
             const Center(
               child: CircularProgressIndicator(color: Colors.white),
             ),
-
-          /// Blur + result overlay
           if (scanSuccess != null) ...[
             Positioned.fill(
               child: BackdropFilter(
@@ -185,8 +163,6 @@ class _ScannerScreenState extends State<ScannerScreen> {
           ],
         ],
       ),
-
-      /// Reset button
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF028ECA),
         onPressed: resetScanner,
