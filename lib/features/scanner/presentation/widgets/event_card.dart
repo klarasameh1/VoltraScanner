@@ -9,41 +9,40 @@ class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Color(0xFF101922),
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: const Color(0xFF028ECA),
+      margin: const EdgeInsets.symmetric(vertical: 5),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-        side: const BorderSide(color: Color(0x800053C8), width: 2),
+        borderRadius: BorderRadius.circular(25),
       ),
-      elevation: 5,
+      elevation: 8,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               event.name,
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 19,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-                const SizedBox(width: 4),
+                const Icon(Icons.calendar_today, size: 18, color: Colors.white70),
+                const SizedBox(width: 6),
                 Text(
                   event.date,
-                  style: const TextStyle(color: Colors.grey),
+                  style: const TextStyle(color: Colors.white70),
                 ),
-                const SizedBox(width: 16),
-                const Icon(Icons.access_time_rounded, size: 16, color: Colors.grey),
-                const SizedBox(width: 4),
+                const SizedBox(width: 20),
+                const Icon(Icons.access_time_rounded, size: 18, color: Colors.white70),
+                const SizedBox(width: 6),
                 Text(
                   event.time,
-                  style: const TextStyle(color: Colors.grey),
+                  style: const TextStyle(color: Colors.white70),
                 ),
               ],
             ),

@@ -1,43 +1,53 @@
 import 'package:event_scanner_app/features/scanner/presentation/scanner_screen.dart';
 import 'package:flutter/material.dart';
 
-class ScannerButton extends StatefulWidget {
+class ScannerButton extends StatelessWidget {
   const ScannerButton({super.key});
-  @override
-  State<ScannerButton> createState() => _ScannerButtonState();
-}
 
-class _ScannerButtonState extends State<ScannerButton> {
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
+    return GestureDetector(
+      onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const ScannerScreen())
+          MaterialPageRoute(
+            builder: (context) => const ScannerScreen(),
+          ),
         );
       },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0x800053C8),
-        foregroundColor: Colors.white,
-        shadowColor: Colors.black,
-        elevation: 10,
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
+      child: Container(
+        width: 200,
+        height: 200,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: const LinearGradient(
+            colors: [Color(0xffffd700), Color(0xfff4c430)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.yellow.withOpacity(0.5),
+              blurRadius: 20,
+              spreadRadius: 3,
+            ),
+          ],
         ),
-      ),
-      child: const Column(
-        children: [
-          Icon(
-            Icons.qr_code_scanner,
-            size: 35,
-          ),
-          Text(
-            "Open Scanner",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-        ],
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.qr_code_scanner, size: 55, color: Colors.white),
+            SizedBox(height: 8),
+            Text(
+              "Scan QR",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
