@@ -21,7 +21,7 @@ class ScannerButton extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: const LinearGradient(
-            colors: [Color(0xffffd700), Color(0xfff4c430)],
+            colors: [Color(0xffffd700), Color(0xffffbf00)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
