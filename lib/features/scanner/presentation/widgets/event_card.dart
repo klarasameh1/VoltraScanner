@@ -10,7 +10,6 @@ class EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: const Color(0xFF028ECA),
-      margin: const EdgeInsets.symmetric(vertical: 5),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
       ),

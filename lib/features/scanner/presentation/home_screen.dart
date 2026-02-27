@@ -5,10 +5,10 @@ import 'package:event_scanner_app/models/event.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
-   HomeScreen({super.key});
+  HomeScreen({super.key});
 
-/// Dummy Data till Api is ready
-  List<Event> upcomingEvents = [
+  /// Dummy Events
+  final List<Event> upcomingEvents = [
     Event(id: 1, name: 'BMB Event', date: '2026-03-10', time: '4:00 pm'),
     Event(id: 2, name: 'Find your Fit', date: '2026-03-15', time: '5:00 pm'),
     Event(id: 3, name: 'Coding Competition', date: '2026-03-20', time: '6:30 pm'),
@@ -23,31 +23,32 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       body: SafeArea(
         top: false,
+        bottom: false,
         child: Column(
           children: [
             const CustomAppBar(userName: 'Voltra Scanner'),
+            const SizedBox(height: 24),
 
-            const SizedBox(height: 25),
-
+            /// Scanner Button
             const ScannerButton(),
+            const SizedBox(height: 24),
 
-            const SizedBox(height: 25),
-
+            /// Upcoming Events Section
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       'Upcoming Events',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Color(0xffffd700),
                       ),
                     ),
-                    SizedBox(height: 10,),
+                    SizedBox(height: 5,child: Container(color: const Color(0xffffd700),),),
                     Expanded(child: EventsList(events:upcomingEvents))
                   ],
                 ),
