@@ -18,11 +18,12 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
   bool isLoading = false;
   bool scanned = false;
-
   bool? scanSuccess; // null = no result
   String resultMessage = "";
 
   Future<void> handleScan(String token) async {
+    if (scanned) return;
+
     setState(() {
       isLoading = true;
       scanned = true;
@@ -32,28 +33,24 @@ class _ScannerScreenState extends State<ScannerScreen> {
       final result = await service.verifyToken(token);
       bool success = result["status"] == "success";
 
-      // 🔊 Play Sound
+      // Play success/error sound
       await audioPlayer.stop();
-      if (success) {
-        await audioPlayer.play(
-          AssetSource('sounds/success.mp3'),
-        );
-      } else {
-        await audioPlayer.play(
-          AssetSource('sounds/error.mp3'),
-        );
-      }
+      await audioPlayer.play(
+        AssetSource(success ? 'sounds/success.mp3' : 'sounds/error.mp3'),
+      );
 
-      // 🟢 Show Result Overlay
+      // Show overlay
+      if (!mounted) return;
       setState(() {
         scanSuccess = success;
-        resultMessage = result["message"] ?? "";
+        resultMessage = result["message"] ?? (success ? "Success" : "Failed");
       });
 
-      // ⏳ Wait 2 seconds
+      // Wait so user sees overlay
       await Future.delayed(const Duration(seconds: 2));
 
-      // 🔄 Reset
+      // Reset overlay and scanner
+      if (!mounted) return;
       setState(() {
         scanSuccess = null;
         scanned = false;
@@ -61,12 +58,21 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
       await controller.start();
     } catch (e) {
-      debugPrint(e.toString());
+      debugPrint("Scan error: $e");
+
+      if (!mounted) return;
+      setState(() {
+        scanSuccess = false;
+        resultMessage = "Error scanning QR";
+        scanned = false;
+      });
+      await controller.start();
     }
 
-    setState(() => isLoading = false);
+    if (mounted) setState(() => isLoading = false);
   }
 
+  /// Reset scanner manually
   void resetScanner() async {
     scanned = false;
     await controller.start();
@@ -91,15 +97,13 @@ class _ScannerScreenState extends State<ScannerScreen> {
       ),
       body: Stack(
         children: [
-          /// 📷 Camera
+          /// Camera feed
           MobileScanner(
             controller: controller,
             onDetect: (capture) async {
               if (scanned) return;
-
               final barcode = capture.barcodes.first;
               final code = barcode.rawValue;
-
               if (code != null) {
                 scanned = true;
                 await controller.stop();
@@ -108,35 +112,30 @@ class _ScannerScreenState extends State<ScannerScreen> {
             },
           ),
 
-          /// 🔲 Scanner Frame
+          /// Scanner frame
           Center(
             child: Container(
               width: 250,
               height: 250,
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: const Color(0xffFFD700),
-                  width: 4,
-                ),
+                border: Border.all(color: const Color(0xffFFD700), width: 4),
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
           ),
 
-          /// ⏳ Loading
+          /// Loading spinner
           if (isLoading)
             const Center(
               child: CircularProgressIndicator(color: Colors.white),
             ),
 
-          /// 🌫️ Blur + Result Overlay
+          /// Blur + result overlay
           if (scanSuccess != null) ...[
             Positioned.fill(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                child: Container(
-                  color: Colors.black.withOpacity(0.3),
-                ),
+                child: Container(color: Colors.black.withOpacity(0.3)),
               ),
             ),
             Center(
@@ -148,16 +147,14 @@ class _ScannerScreenState extends State<ScannerScreen> {
                   width: 300,
                   padding: const EdgeInsets.all(30),
                   decoration: BoxDecoration(
-                    color: scanSuccess!
-                        ? Colors.green
-                        : Colors.red,
+                    color: scanSuccess! ? Colors.green : Colors.red,
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.5),
                         blurRadius: 25,
                         spreadRadius: 2,
-                      )
+                      ),
                     ],
                   ),
                   child: Column(
@@ -189,10 +186,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
         ],
       ),
 
+      /// Reset button
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF028ECA),
         onPressed: resetScanner,
-        child: const Icon(Icons.refresh , color:Color(0xffFFD700) ,),
+        child: const Icon(Icons.refresh, color: Color(0xffFFD700)),
       ),
     );
   }
