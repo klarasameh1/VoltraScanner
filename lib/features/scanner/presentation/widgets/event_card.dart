@@ -31,14 +31,14 @@ class EventCard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(Icons.calendar_today, size: 18, color: Colors.white70),
+                const Icon(Icons.calendar_today, size: 18, color: Color(0xffffd700)),
                 const SizedBox(width: 6),
                 Text(
                   event.date,
                   style: const TextStyle(color: Colors.white70),
                 ),
                 const SizedBox(width: 20),
-                const Icon(Icons.access_time_rounded, size: 18, color: Colors.white70),
+                const Icon(Icons.access_time_rounded, size: 18, color: Color(0xffffd700)),
                 const SizedBox(width: 6),
                 Text(
                   event.time,
