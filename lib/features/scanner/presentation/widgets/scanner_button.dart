@@ -1,4 +1,4 @@
-import 'package:event_scanner_app/features/scanner/presentation/scanner_screen.dart';
+import 'package:event_scanner_app/features/scanner/presentation/screens/scanner_screen.dart';
 import 'package:flutter/material.dart';
 
 class ScannerButton extends StatelessWidget {

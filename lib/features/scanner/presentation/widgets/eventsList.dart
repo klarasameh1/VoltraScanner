@@ -1,5 +1,5 @@
+import 'package:event_scanner_app/features/scanner/data/models/event.dart';
 import 'package:event_scanner_app/features/scanner/presentation/widgets/event_card.dart';
-import 'package:event_scanner_app/models/event.dart';
 import 'package:flutter/material.dart';
 
 class EventsList extends StatelessWidget {

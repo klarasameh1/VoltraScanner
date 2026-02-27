@@ -1,6 +1,8 @@
 import 'dart:convert';
 
-import 'package:event_scanner_app/models/event.dart';
+import 'package:event_scanner_app/features/scanner/data/models/event.dart';
+import 'package:http/http.dart' as http;
+
 /// WHEN API READY
 // class EventsService {
 //   Future<List<Event>> getUpcomingEvents() async {

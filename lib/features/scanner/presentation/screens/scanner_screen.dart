@@ -1,8 +1,8 @@
 import 'dart:ui';
+import 'package:event_scanner_app/features/scanner/data/services/qr_service.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:audioplayers/audioplayers.dart';
-import '../checkin_service.dart';
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
@@ -13,7 +13,7 @@ class ScannerScreen extends StatefulWidget {
 
 class _ScannerScreenState extends State<ScannerScreen> {
   final MobileScannerController controller = MobileScannerController();
-  final CheckinService service = CheckinService();
+  final QrService service = QrService();
   final AudioPlayer audioPlayer = AudioPlayer();
 
   bool isLoading = false;
