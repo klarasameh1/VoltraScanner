@@ -79,14 +79,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 5),
                     Container(height: 2, color: const Color(0xffffd700)),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 6),
 
                     Expanded(
                       child: Builder(
                         builder: (_) {
                           if (isLoading) {
                             return const Center(
-                              child: CircularProgressIndicator(),
+                              child: CircularProgressIndicator(color:Color(0xFF028ECA) ,),
                             );
                           }
 
