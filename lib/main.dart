@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'features/scanner/presentation/screens/home_screen.dart';
+import 'providers/event_provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -10,14 +13,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  MaterialApp(
-      theme: ThemeData(
-        fontFamily: 'Lexend',
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => EventProvider()),
+      ],
+      child: MaterialApp(
+        theme: ThemeData(
+          fontFamily: 'Lexend',
+        ),
+        debugShowCheckedModeBanner: false,
+        title: 'ALX Scanner',
+        home: const HomeScreen(),
       ),
-      debugShowCheckedModeBanner: false,
-      title: 'ALX Scanner',
-      home: HomeScreen(),
     );
   }
 }
-

@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:event_scanner_app/core/utils/api_response.dart';
 import 'package:event_scanner_app/features/scanner/data/models/event.dart';
 import 'package:event_scanner_app/features/scanner/data/services/qr_service.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class ScannerScreen extends StatefulWidget {
-  final Event event; // receive the event
+  final Event event;
 
   const ScannerScreen({super.key, required this.event});
 
@@ -24,8 +25,24 @@ class _ScannerScreenState extends State<ScannerScreen> {
   bool? scanSuccess;
   String resultMessage = "";
 
+  @override
+  void initState() {
+    super.initState();
+    _initAudio();
+  }
+
+  Future<void> _initAudio() async {
+    try {
+      await audioPlayer.setSource(AssetSource('sounds/success.mp3'));
+      await audioPlayer.setSource(AssetSource('sounds/failed.mp3'));
+    } catch (e) {
+      debugPrint('Audio init error: $e');
+    }
+  }
+
   Future<void> handleScan(String token) async {
-    if (scanned) return; // prevent multiple scans
+    if (scanned) return;
+
     setState(() {
       isLoading = true;
       scanned = true;
@@ -33,43 +50,131 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
     try {
       final result = await service.verifyToken(token);
-      bool success = result["status"] == "success";
 
-      await audioPlayer.stop();
-      await audioPlayer.play(
-        AssetSource(success ? 'sounds/success.mp3' : 'sounds/failed.mp3'),
-      );
+      if (result.isSuccess) {
+        final data = result.data!;
+        bool success = data["status"] == "success";
 
-      if (!mounted) return;
-      setState(() {
-        scanSuccess = success;
-        resultMessage = result["message"] ?? (success ? "Success" : "Failed");
-      });
+        // AUDIO
+        try {
+          await audioPlayer.stop();
+          await audioPlayer.play(
+            AssetSource(success ? 'sounds/success.mp3' : 'sounds/failed.mp3'),
+          );
+        } catch (e) {
+          debugPrint('Audio playback error: $e');
+        }
 
-      if (success) {
-        // Increase the checked-in count for the event
-        widget.event.checkedInCount += 1;
+        if (!mounted) return;
+
+        setState(() {
+          scanSuccess = success;
+          resultMessage = data["message"] ?? (success ? "Success" : "Failed");
+        });
+
+        if (success) {
+          widget.event.checkedInCount += 1;
+        }
+
+        // WAIT 2 SECONDS
+        await Future.delayed(const Duration(seconds: 2));
+
+        if (!mounted) return;
+        Navigator.pop(context, widget.event.checkedInCount);
+      } else {
+        // IN failed case
+        setState(() {
+          scanSuccess = false;
+          resultMessage = result.error!;
+        });
+
+        await Future.delayed(const Duration(seconds: 2));
+        if (!mounted) return;
+
+        setState(() {
+          scanSuccess = null;
+          scanned = false;
+          isLoading = false;
+        });
+
+        await controller.start(); // Rescan
       }
-
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (!mounted) return;
-      Navigator.pop(context, widget.event.checkedInCount); // return count to HomeScreen
     } catch (e) {
       debugPrint("Scan error: $e");
       if (!mounted) return;
+
       setState(() {
         scanSuccess = false;
         resultMessage = "Error scanning QR";
-        scanned = false;
       });
+
+      await Future.delayed(const Duration(seconds: 2));
+      if (!mounted) return;
+
+      setState(() {
+        scanSuccess = null;
+        scanned = false;
+        isLoading = false;
+      });
+
+      await controller.start();
     } finally {
-      if (mounted) setState(() => isLoading = false);
+      if (mounted && scanSuccess == null) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
+  /// FOR TESTING
+  // Future<void> _testScan(String token, {bool isSuccess = true}) async {
+  //   if (scanned) return;
+  //
+  //   // محاكاة الـ API
+  //   await Future.delayed(const Duration(seconds: 1));
+  //
+  //   if (isSuccess) {
+  //     widget.event.checkedInCount += 1;
+  //     setState(() {
+  //       scanSuccess = true;
+  //       resultMessage = "Check-in successful (Test)";
+  //     });
+  //   } else {
+  //     setState(() {
+  //       scanSuccess = false;
+  //       resultMessage = "Invalid QR Code (Test)";
+  //     });
+  //   }
+  //
+  //   try {
+  //     await audioPlayer.stop();
+  //     await audioPlayer.play(
+  //       AssetSource(isSuccess ? 'sounds/success.mp3' : 'sounds/failed.mp3'),
+  //     );
+  //   } catch (e) {
+  //     debugPrint('Audio playback error: $e');
+  //   }
+  //
+  //   await Future.delayed(const Duration(seconds: 2));
+  //
+  //   if (!mounted) return;
+  //
+  //   if (isSuccess) {
+  //     Navigator.pop(context, widget.event.checkedInCount);
+  //   } else {
+  //     setState(() {
+  //       scanSuccess = null;
+  //       scanned = false;
+  //     });
+  //   }
+  // }
+  ///-------------------------------------------------------
+
   void resetScanner() async {
-    scanned = false;
+    setState(() {
+      scanned = false;
+      scanSuccess = null;
+      isLoading = false;
+    });
     await controller.start();
   }
 
@@ -89,16 +194,30 @@ class _ScannerScreenState extends State<ScannerScreen> {
         foregroundColor: const Color(0xffFFD700),
         centerTitle: true,
         backgroundColor: const Color(0xFF028ECA),
+        ///TESTING
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.check_circle, color: Colors.green),
+        //     onPressed: () => _testScan("123", isSuccess: true),
+        //     tooltip: "Test Success",
+        //   ),
+        //   IconButton(
+        //     icon: const Icon(Icons.cancel, color: Colors.red),
+        //     onPressed: () => _testScan("INVALID", isSuccess: false),
+        //     tooltip: "Test Fail",
+        //   ),
+        // ],
+        ///-------------------------------------------------------
       ),
       body: Stack(
         children: [
           MobileScanner(
             controller: controller,
             onDetect: (capture) {
-              if (scanned) return;
+              if (scanned || isLoading) return;
               final barcode = capture.barcodes.first;
               final code = barcode.rawValue;
-              if (code != null) {
+              if (code != null && code.isNotEmpty) {
                 handleScan(code);
               }
             },
@@ -111,12 +230,15 @@ class _ScannerScreenState extends State<ScannerScreen> {
                 border: Border.all(color: const Color(0xffFFD700), width: 4),
                 borderRadius: BorderRadius.circular(20),
               ),
+              child: isLoading && scanSuccess == null
+                  ? const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
+              )
+                  : null,
             ),
           ),
-          if (isLoading)
-            const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
           if (scanSuccess != null) ...[
             Positioned.fill(
               child: BackdropFilter(
@@ -163,6 +285,17 @@ class _ScannerScreenState extends State<ScannerScreen> {
                           color: Colors.white,
                         ),
                       ),
+                      if (!scanSuccess!) ...[
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: resetScanner,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.red,
+                          ),
+                          child: const Text('Try Again'),
+                        ),
+                      ],
                     ],
                   ),
                 ),

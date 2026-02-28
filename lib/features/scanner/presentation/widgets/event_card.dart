@@ -13,6 +13,23 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Determine event status color
+    final DateTime eventDate = DateTime.parse(event.date); // assuming event.date is 'YYYY-MM-DD'
+    final DateTime today = DateTime.now();
+    Color statusColor;
+    bool isToday = false ;
+
+    if (eventDate.year == today.year &&
+        eventDate.month == today.month &&
+        eventDate.day == today.day) {
+      statusColor = Color(0xff4fea44); // Today
+      isToday=true;
+    } else if (eventDate.isAfter(today)) {
+      statusColor = Colors.yellow; // Upcoming
+    } else {
+      statusColor = Colors.grey; // Past events (optional)
+    }
+
     return GestureDetector(
       onTap: onTap,
       child: Card(
@@ -26,16 +43,31 @@ class EventCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                event.name,
-                style: const TextStyle(
-                  fontSize: 19,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      event.name,
+                      style: const TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  // Status
+                  Text(
+                    isToday?"Today !":"",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: statusColor,
+                    ),
+                  ),
+
+                ],
               ),
               const SizedBox(height: 12),
-
               Row(
                 children: [
                   const Icon(
@@ -61,19 +93,11 @@ class EventCard extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(height: 16),
-
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Text(
-                    "Checked In",
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
-                  ),
+                  const Icon(Icons.person , color:Color(0xffffd700) ,),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 14,
@@ -87,7 +111,7 @@ class EventCard extends StatelessWidget {
                       event.checkedInCount.toString(),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: Color(0xFF028ECA),
                       ),
                     ),
                   ),

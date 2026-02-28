@@ -1,8 +1,9 @@
-import 'package:event_scanner_app/features/scanner/data/models/event.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:event_scanner_app/features/scanner/presentation/screens/scanner_screen.dart';
 import 'package:event_scanner_app/features/scanner/presentation/widgets/app_bar.dart';
 import 'package:event_scanner_app/features/scanner/presentation/widgets/event_card.dart';
-import 'package:flutter/material.dart';
+import 'package:event_scanner_app/providers/event_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,44 +13,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool isLoading = true;
-  String? errorMessage;
-  List<Event> upcomingEvents = [];
-
   @override
   void initState() {
     super.initState();
-    fetchEvents();
+    // استدعاء fetchEvents من Provider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<EventProvider>().fetchEvents();
+    });
   }
 
-  Future<void> fetchEvents() async {
-    try {
-
-      // Dummy data (replace with real API call later)
-      await Future.delayed(const Duration(seconds: 2)); // simulate API delay
-      final events = [
-        Event(id: 1, name: 'BMB Event', date: '2026-03-10', time: '4:00 pm', checkedInCount: 15),
-        Event(id: 2, name: 'Find your Fit', date: '2026-03-15', time: '5:00 pm', checkedInCount: 0),
-        Event(id: 3, name: 'Coding Competition', date: '2026-03-20', time: '6:30 pm', checkedInCount: 0),
-      ];
-      /// Replace later with
-      //final events = await eventsService.getUpcomingEvents();
-
-      if (!mounted) return;
-
-      setState(() {
-        upcomingEvents = events;
-        isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-
-      setState(() {
-        errorMessage = "Failed to load events. Please check your connection.";
-        isLoading = false;
-      });
-    }
+  Future<void> _refreshEvents() async {
+    await context.read<EventProvider>().fetchEvents();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Upcoming Events',
+                      'Our Coming Events',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -78,32 +54,49 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    Container(height: 2, color: const Color(0xffffd700)),
-                    const SizedBox(height: 6),
+                    Container(height: 4, color: const Color(0xffffd700)),
 
                     Expanded(
-                      child: Builder(
-                        builder: (_) {
-                          if (isLoading) {
+                      child: Consumer<EventProvider>(
+                        builder: (context, eventProvider, child) {
+                          if (eventProvider.isLoading) {
                             return const Center(
-                              child: CircularProgressIndicator(color:Color(0xFF028ECA) ,),
-                            );
-                          }
-
-                          if (errorMessage != null) {
-                            return Center(
-                              child: Text(
-                                errorMessage!,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 16,
-                                ),
+                              child: CircularProgressIndicator(
+                                color: Color(0xFF028ECA),
                               ),
                             );
                           }
 
-                          if (upcomingEvents.isEmpty) {
+                          if (eventProvider.errorMessage != null) {
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    eventProvider.errorMessage!,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  ElevatedButton(
+                                    onPressed: _refreshEvents,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF028ECA),
+                                    ),
+                                    child: const Text(
+                                      'Try Again',
+                                      style: TextStyle(color: Color(0xffffd700)),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          if (eventProvider.upcomingEvents.isEmpty) {
                             return const Center(
                               child: Text(
                                 "No upcoming events",
@@ -115,30 +108,35 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           }
 
-                          return ListView.builder(
-                            itemCount: upcomingEvents.length,
-                            itemBuilder: (context, index) {
-                              final event = upcomingEvents[index]; // define event here
+                          return RefreshIndicator(
+                            onRefresh: _refreshEvents,
+                            color: const Color(0xFF028ECA),
+                            child: ListView.builder(
+                              itemCount: eventProvider.upcomingEvents.length,
+                              itemBuilder: (context, index) {
+                                final event = eventProvider.upcomingEvents[index];
 
-                              return EventCard(
-                                event: event,
-                                onTap: () async {
-                                  final updatedCount = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => ScannerScreen(event: event),
-                                    ),
-                                  );
+                                return EventCard(
+                                  event: event,
+                                  onTap: () async {
+                                    final updatedCount = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => ScannerScreen(event: event),
+                                      ),
+                                    );
 
-                                  if (updatedCount != null) {
-                                    setState(() {
-                                      upcomingEvents[index] =
-                                          event.copyWith(checkedInCount: updatedCount);
-                                    });
-                                  }
-                                },
-                              );
-                            },
+                                    if (updatedCount != null) {
+                                      // تحديث في Provider
+                                      eventProvider.updateEventCheckedInCount(
+                                        event.id,
+                                        updatedCount,
+                                      );
+                                    }
+                                  },
+                                );
+                              },
+                            ),
                           );
                         },
                       ),
