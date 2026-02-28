@@ -1,11 +1,14 @@
 import 'dart:ui';
+import 'package:event_scanner_app/features/scanner/data/models/event.dart';
 import 'package:event_scanner_app/features/scanner/data/services/qr_service.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class ScannerScreen extends StatefulWidget {
-  const ScannerScreen({super.key});
+  final Event event; // receive the event
+
+  const ScannerScreen({super.key, required this.event});
 
   @override
   State<ScannerScreen> createState() => _ScannerScreenState();
@@ -22,7 +25,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
   String resultMessage = "";
 
   Future<void> handleScan(String token) async {
-    setState(() => isLoading = true);
+    if (scanned) return; // prevent multiple scans
+    setState(() {
+      isLoading = true;
+      scanned = true;
+    });
 
     try {
       final result = await service.verifyToken(token);
@@ -39,13 +46,15 @@ class _ScannerScreenState extends State<ScannerScreen> {
         resultMessage = result["message"] ?? (success ? "Success" : "Failed");
       });
 
+      if (success) {
+        // Increase the checked-in count for the event
+        widget.event.checkedInCount += 1;
+      }
+
       await Future.delayed(const Duration(seconds: 2));
 
       if (!mounted) return;
-      setState(() {
-        scanSuccess = null;
-        scanned = false;
-      });
+      Navigator.pop(context, widget.event.checkedInCount); // return count to HomeScreen
     } catch (e) {
       debugPrint("Scan error: $e");
       if (!mounted) return;
@@ -54,9 +63,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
         resultMessage = "Error scanning QR";
         scanned = false;
       });
+    } finally {
+      if (mounted) setState(() => isLoading = false);
     }
-
-    if (mounted) setState(() => isLoading = false);
   }
 
   void resetScanner() async {
@@ -90,7 +99,6 @@ class _ScannerScreenState extends State<ScannerScreen> {
               final barcode = capture.barcodes.first;
               final code = barcode.rawValue;
               if (code != null) {
-                scanned = true;
                 handleScan(code);
               }
             },

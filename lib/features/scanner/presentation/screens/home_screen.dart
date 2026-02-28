@@ -1,7 +1,7 @@
 import 'package:event_scanner_app/features/scanner/data/models/event.dart';
+import 'package:event_scanner_app/features/scanner/presentation/screens/scanner_screen.dart';
 import 'package:event_scanner_app/features/scanner/presentation/widgets/app_bar.dart';
-import 'package:event_scanner_app/features/scanner/presentation/widgets/eventsList.dart';
-import 'package:event_scanner_app/features/scanner/presentation/widgets/scanner_button.dart';
+import 'package:event_scanner_app/features/scanner/presentation/widgets/event_card.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,9 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
       // Dummy data (replace with real API call later)
       await Future.delayed(const Duration(seconds: 2)); // simulate API delay
       final events = [
-        Event(id: 1, name: 'BMB Event', date: '2026-03-10', time: '4:00 pm'),
-        Event(id: 2, name: 'Find your Fit', date: '2026-03-15', time: '5:00 pm'),
-        Event(id: 3, name: 'Coding Competition', date: '2026-03-20', time: '6:30 pm'),
+        Event(id: 1, name: 'BMB Event', date: '2026-03-10', time: '4:00 pm', checkedInCount: 15),
+        Event(id: 2, name: 'Find your Fit', date: '2026-03-15', time: '5:00 pm', checkedInCount: 0),
+        Event(id: 3, name: 'Coding Competition', date: '2026-03-20', time: '6:30 pm', checkedInCount: 0),
       ];
       /// Replace later with
       //final events = await eventsService.getUpcomingEvents();
@@ -61,8 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             const CustomAppBar(userName: 'Voltra Scanner'),
-            const SizedBox(height: 24),
-            const ScannerButton(),
             const SizedBox(height: 24),
 
             Expanded(
@@ -117,7 +115,31 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           }
 
-                          return EventsList(events: upcomingEvents);
+                          return ListView.builder(
+                            itemCount: upcomingEvents.length,
+                            itemBuilder: (context, index) {
+                              final event = upcomingEvents[index]; // define event here
+
+                              return EventCard(
+                                event: event,
+                                onTap: () async {
+                                  final updatedCount = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ScannerScreen(event: event),
+                                    ),
+                                  );
+
+                                  if (updatedCount != null) {
+                                    setState(() {
+                                      upcomingEvents[index] =
+                                          event.copyWith(checkedInCount: updatedCount);
+                                    });
+                                  }
+                                },
+                              );
+                            },
+                          );
                         },
                       ),
                     ),
