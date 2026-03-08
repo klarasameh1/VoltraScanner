@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:event_scanner_app/core/theme/app_colors.dart';
 import 'package:event_scanner_app/core/utils/api_response.dart';
 import 'package:event_scanner_app/features/scanner/data/models/event.dart';
 import 'package:event_scanner_app/features/scanner/data/services/qr_service.dart';
@@ -191,9 +192,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text("Scanner"),
-        foregroundColor: const Color(0xffFFD700),
+        foregroundColor: AppColors.yellow,
         centerTitle: true,
-        backgroundColor: const Color(0xFF028ECA),
+        backgroundColor: AppColors.primary,
         ///TESTING
         // actions: [
         //   IconButton(
@@ -227,13 +228,13 @@ class _ScannerScreenState extends State<ScannerScreen> {
               width: 250,
               height: 250,
               decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xffFFD700), width: 4),
+                border: Border.all(color:  AppColors.yellow, width: 4),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: isLoading && scanSuccess == null
                   ? const Center(
                 child: CircularProgressIndicator(
-                  color: Colors.white,
+                  color: AppColors.white,
                 ),
               )
                   : null,
@@ -255,7 +256,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                   width: 300,
                   padding: const EdgeInsets.all(30),
                   decoration: BoxDecoration(
-                    color: scanSuccess! ? Colors.green : Colors.red,
+                    color: scanSuccess! ? AppColors.accentGreen : AppColors.red,
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
@@ -273,7 +274,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                             ? Icons.check_circle_rounded
                             : Icons.cancel_rounded,
                         size: 100,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                       const SizedBox(height: 20),
                       Text(
@@ -282,7 +283,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: AppColors.white,
                         ),
                       ),
                       if (!scanSuccess!) ...[
@@ -290,8 +291,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
                         ElevatedButton(
                           onPressed: resetScanner,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.red,
+                            backgroundColor: AppColors.white,
+                            foregroundColor: AppColors.red,
                           ),
                           child: const Text('Try Again'),
                         ),
@@ -305,9 +306,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF028ECA),
+        backgroundColor: AppColors.primary,
         onPressed: resetScanner,
-        child: const Icon(Icons.refresh, color: Color(0xffFFD700)),
+        child: const Icon(Icons.refresh, color: AppColors.yellow),
       ),
     );
   }
