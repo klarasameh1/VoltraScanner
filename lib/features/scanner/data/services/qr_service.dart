@@ -4,7 +4,7 @@ import 'package:event_scanner_app/core/utils/api_response.dart';
 import 'package:http/http.dart' as http;
 
 class QrService {
-  // Dummy data مؤقتاً
+  // Dummy data
   Future<ApiResponse<Map<String, dynamic>>> verifyToken(String token) async {
     await Future.delayed(const Duration(seconds: 1));
 
@@ -23,7 +23,7 @@ class QrService {
   Future<ApiResponse<Map<String, dynamic>>> verifyToken(String token) async {
     try {
       final response = await http.post(
-        Uri.parse("${ApiConstants.baseUrl}${ApiConstants.checkin}"),
+        Uri.parse("${ApiConstants.baseUrl}${ApiConstants.checkIn}"),
         headers: {
           "Content-Type": "application/json",
         },
