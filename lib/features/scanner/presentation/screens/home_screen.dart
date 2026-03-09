@@ -122,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   builder: (context, provider, _) {
                     final futureEvents = provider.futureEvents;
 
-                    if (futureEvents.isEmpty) {
+                    if (futureEvents.isEmpty & !provider.isLoading) {
                       return ListView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         children: const [
