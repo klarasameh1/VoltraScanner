@@ -16,12 +16,12 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DateTime eventDate = DateTime.parse(event.date);
+    final DateTime eventDate = event.date;
     final DateTime today = DateTime.now();
 
     // Determine if this event is Today
-    bool showToday =
-        isToday || (eventDate.year == today.year &&
+    bool showToday = isToday ||
+        (eventDate.year == today.year &&
             eventDate.month == today.month &&
             eventDate.day == today.day);
 
@@ -59,7 +59,7 @@ class EventCard extends StatelessWidget {
               if (showToday)
                 Container(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     color: AppColors.accentGreen,
                     borderRadius: BorderRadius.circular(15),
@@ -88,7 +88,7 @@ class EventCard extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                event.date,
+                "${eventDate.day}/${eventDate.month}/${eventDate.year}",
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(width: 20),
@@ -117,8 +117,8 @@ class EventCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
                     color: AppColors.yellow,
                     borderRadius: BorderRadius.circular(20),

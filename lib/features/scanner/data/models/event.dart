@@ -1,23 +1,23 @@
 class Event {
   final int id;
   final String name;
-  final String date;
+  final DateTime date;
   final String time;
   int checkedInCount;
 
-   Event({
+  Event({
     required this.id,
     required this.name,
     required this.date,
     required this.time,
-     required this.checkedInCount,
+    required this.checkedInCount,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
     return Event(
       id: json["id"],
       name: json["name"],
-      date: json["date"],
+      date: DateTime.parse(json["date"]), // تحويل String إلى DateTime
       time: json["time"],
       checkedInCount: json["checkedInCount"] ?? 0,
     );
@@ -27,7 +27,7 @@ class Event {
     return {
       "id": id,
       "name": name,
-      "date": date,
+      "date": date.toIso8601String(), // تحويل DateTime إلى String عند الإرسال
       "time": time,
       "checkedInCount": checkedInCount,
     };
@@ -36,7 +36,7 @@ class Event {
   Event copyWith({
     int? id,
     String? name,
-    String? date,
+    DateTime? date,
     String? time,
     int? checkedInCount,
   }) {

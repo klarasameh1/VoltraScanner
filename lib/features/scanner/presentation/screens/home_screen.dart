@@ -34,135 +34,135 @@ class _HomeScreenState extends State<HomeScreen> {
         top: false,
         bottom: false,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const CustomAppBar(userName: 'Voltra Scanner'),
             const SizedBox(height: 24),
 
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+            // Today Section "fixed"
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Consumer<EventProvider>(
+                builder: (context, provider, _) {
+                  if (provider.isLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: AppColors.primary),
+                    );
+                  }
 
-                    // Today Section
-                    Consumer<EventProvider>(
-                      builder: (context, provider, _) {
-                        final todayEvents = provider.todayEvents;
+                  final todayEvents = provider.todayEvents;
 
-                        if (todayEvents.isEmpty) return const SizedBox();
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 6,
-                                  height: 24,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.accentGreen,
-                                    borderRadius: BorderRadius.circular(3),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  'Today!',
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primary,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            EventCard(
-                              event: todayEvents.first,
-                              isToday: true,
-                              onScan: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => ScannerScreen(event: todayEvents.first),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Coming Events Header
-                    const Text(
-                      'Coming Events',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Container(
-                      height: 4,
-                      color: AppColors.accentGreen,
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Event List
-                    Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: _refreshEvents,
-                        color: AppColors.accentGreen,
-                        child: Consumer<EventProvider>(
-                          builder: (context, provider, _) {
-                            if (provider.isLoading) {
-                              return const Center(
-                                child: CircularProgressIndicator(color: AppColors.teal),
-                              );
-                            }
-
-                            final futureEvents = provider.futureEvents;
-
-                            if (futureEvents.isEmpty) {
-                              return const Center(
-                                child: Text(
-                                  "No upcoming events",
-                                  style: TextStyle(
-                                    color: AppColors.textSecondary,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              );
-                            }
-
-                            return ListView.builder(
-                              padding: const EdgeInsets.only(top: 8),
-                              itemCount: futureEvents.length,
-                              itemBuilder: (context, index) {
-                                final event = futureEvents[index];
-                                return EventCard(
-                                  event: event,
-                                  isToday: false,
-                                  onScan: null,
-                                );
-                              },
-                            );
-                          },
+                  if (todayEvents.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(
+                        child: Text(
+                          "No events today ...",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
-                    ),
+                    );
+                  }
 
-                  ],
+                  return EventCard(
+                    event: todayEvents.first,
+                    isToday: true,
+                    onScan: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ScannerScreen(event: todayEvents.first),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Coming Events Header
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Coming Events',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Container(
+              height: 4,
+              color: AppColors.accentGreen,
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+            ),
+            const SizedBox(height: 12),
+
+            // Coming Events List (scrollable + refreshable)
+            Expanded(
+              child: RefreshIndicator(
+                notificationPredicate: (notification) => notification.depth == 0,
+                onRefresh: _refreshEvents,
+                color: AppColors.primary,
+                backgroundColor: Colors.white,
+                strokeWidth: 3,
+                displacement: 60,
+                edgeOffset: 10,
+
+
+                child: Consumer<EventProvider>(
+                  builder: (context, provider, _) {
+                    final futureEvents = provider.futureEvents;
+
+                    if (futureEvents.isEmpty) {
+                      return ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: const [
+                          SizedBox(height: 200),
+                          Center(
+                            child: Text(
+                              "No upcoming events",
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
+                    return ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(), // مهم
+
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      itemCount: futureEvents.length,
+                      itemBuilder: (context, index) {
+                        final event = futureEvents[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: EventCard(
+                            event: event,
+                            isToday: false,
+                            onScan: null,
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
             ),
           ],
-        ),
+        )
       ),
     );
   }
