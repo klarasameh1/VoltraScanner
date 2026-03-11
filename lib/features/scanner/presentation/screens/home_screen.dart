@@ -33,136 +33,167 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         top: false,
         bottom: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const CustomAppBar(userName: 'Voltra Scanner'),
-            const SizedBox(height: 24),
+        child: RefreshIndicator(
+          onRefresh: _refreshEvents,
+          color: AppColors.primary,
+          backgroundColor: Colors.white,
+          strokeWidth: 3,
+          displacement: 60,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const CustomAppBar(userName: 'Voltra Scanner'),
+                const SizedBox(height: 24),
 
-            // Today Section "fixed"
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Consumer<EventProvider>(
-                builder: (context, provider, _) {
-                  if (provider.isLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: AppColors.primary),
-                    );
-                  }
-
-                  final todayEvents = provider.todayEvents;
-
-                  if (todayEvents.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      child: Center(
-                        child: Text(
-                          "No events today ...",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textSecondary,
-                          ),
+                // Today Events Section - الهيدر دايماً موجود
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Today's Events",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
                         ),
                       ),
-                    );
-                  }
+                      const SizedBox(height: 8),
+                      Container(
+                        height: 4,
+                        color: AppColors.accentGreen,
+                      ),
+                      const SizedBox(height: 12),
 
-                  return EventCard(
-                    event: todayEvents.first,
-                    isToday: true,
-                    onScan: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ScannerScreen(event: todayEvents.first),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Coming Events Header
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Coming Events',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-              ),
-            ),
-            const SizedBox(height: 5),
-            Container(
-              height: 4,
-              color: AppColors.accentGreen,
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-            ),
-            const SizedBox(height: 12),
-
-            // Coming Events List (scrollable + refreshable)
-            Expanded(
-              child: RefreshIndicator(
-                notificationPredicate: (notification) => notification.depth == 0,
-                onRefresh: _refreshEvents,
-                color: AppColors.primary,
-                backgroundColor: Colors.white,
-                strokeWidth: 3,
-                displacement: 60,
-                edgeOffset: 10,
-
-
-                child: Consumer<EventProvider>(
-                  builder: (context, provider, _) {
-                    final futureEvents = provider.futureEvents;
-
-                    if (futureEvents.isEmpty & !provider.isLoading) {
-                      return ListView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        children: const [
-                          SizedBox(height: 200),
-                          Center(
-                            child: Text(
-                              "No upcoming events",
-                              style: TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 16,
+                      // محتوى أحداث اليوم
+                      Consumer<EventProvider>(
+                        builder: (context, provider, _) {
+                          if (provider.isLoading && provider.events.isEmpty) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(20),
+                                child: CircularProgressIndicator(color: AppColors.primary),
                               ),
-                            ),
-                          ),
-                        ],
-                      );
-                    }
+                            );
+                          }
 
-                    return ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(), // مهم
+                          final todayEvents = provider.todayEvents;
 
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      itemCount: futureEvents.length,
-                      itemBuilder: (context, index) {
-                        final event = futureEvents[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: EventCard(
-                            event: event,
-                            isToday: false,
-                            onScan: null,
-                          ),
-                        );
-                      },
-                    );
-                  },
+                          if (todayEvents.isEmpty) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              child: Center(
+                                child: Text(
+                                  "No events today",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+
+                          return Column(
+                            children: todayEvents.map((event) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: EventCard(
+                                event: event,
+                                isToday: true,
+                                onScan: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ScannerScreen(event: event),
+                                    ),
+                                  );
+                                },
+                              ),
+                            )).toList(),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+
+                const SizedBox(height: 24),
+
+                // Coming Events Section - الهيدر دايماً موجود
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Coming Events',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Container(
+                        height: 4,
+                        color: AppColors.accentGreen,
+                      ),
+                      const SizedBox(height: 12),
+
+                      // محتوى الأحداث القادمة
+                      Consumer<EventProvider>(
+                        builder: (context, provider, _) {
+                          final futureEvents = provider.futureEvents;
+
+                          if (provider.isLoading) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(20),
+                                child: CircularProgressIndicator(color: AppColors.primary),
+                              ),
+                            );
+                          }
+
+                          if (futureEvents.isEmpty) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              child: Center(
+                                child: Text(
+                                  "No upcoming events",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+
+                          return Column(
+                            children: futureEvents.map((event) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: EventCard(
+                                event: event,
+                                isToday: false,
+                                onScan: null,
+                              ),
+                            )).toList(),
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 20), // مسافة في النهاية
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        )
+          ),
+        ),
       ),
     );
   }

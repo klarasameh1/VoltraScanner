@@ -37,8 +37,6 @@ class EventProvider extends ChangeNotifier {
     }).toList();
   }
 
-  List<Event> get upcomingEvents => futureEvents;
-
   /// Fetch events (dummy data for now)
   Future<void> fetchEvents() async {
     _isLoading = true;

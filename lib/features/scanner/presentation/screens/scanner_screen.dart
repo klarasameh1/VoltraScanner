@@ -42,6 +42,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
     setState(() {
       isLoading = true;
       scanned = true;
+      scanSuccess = null;
     });
 
     try {
@@ -50,7 +51,17 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
       if (result.status == Status.success) {
         final data = result.data!;
-        bool success = data["status"] == "success";
+
+        bool success = data["success"] == true ||
+            data["status"] == "success" ||
+            data["statusCode"] == 200 ||
+            (data["data"] != null && data["data"]["status"] == "success");
+
+        String message = data["message"] ??
+            data["msg"] ??
+            data["data"]?["message"] ??
+            (success ? "Check-in successful" : "Check-in failed");
+        resultMessage = message; // تحديث المتغير
 
         // Play audio feedback
         await audioPlayer.playFeedback(success);
@@ -78,15 +89,25 @@ class _ScannerScreenState extends State<ScannerScreen> {
     } catch (e) {
       handleScanFailure("Error scanning QR");
     } finally {
-      if (mounted && scanSuccess == null) setState(() => isLoading = false);
+      if (mounted) {
+        // تأكد من إيقاف التحميل فقط إذا لم يظهر overlay
+        if (scanSuccess == null) {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      }
     }
   }
 
   void handleScanFailure(String message) async {
-    setState(() {
-      scanSuccess = false;
-      resultMessage = message;
-    });
+    if (mounted) {
+      setState(() {
+        scanSuccess = null;
+        scanned = false;
+        isLoading = false;
+      });
+    }
 
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
