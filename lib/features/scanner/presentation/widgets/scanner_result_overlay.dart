@@ -22,7 +22,7 @@ class ResultOverlay extends StatelessWidget {
         Positioned.fill(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-            child: Container(color: Colors.black.withOpacity(0.3)),
+            child: Container(color: Colors.black.withValues(alpha: 0.3)),
           ),
         ),
         // Centered result box
@@ -39,7 +39,7 @@ class ResultOverlay extends StatelessWidget {
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     blurRadius: 25,
                     spreadRadius: 2,
                   ),

@@ -28,7 +28,7 @@ class CustomAppBar extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -42,15 +42,6 @@ class CustomAppBar extends StatelessWidget {
             width: 220,
             height: 80,
           ),
-          if (showNotificationSwitch) ...[
-            const SizedBox(width: 16),
-            Switch(
-              value: notificationsEnabled,
-              onChanged: onNotificationToggle,
-              activeColor: AppColors.accentGreen,
-              inactiveThumbColor: Colors.grey[300],
-            ),
-          ]
         ],
       ),
     );
