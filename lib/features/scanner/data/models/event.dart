@@ -17,7 +17,7 @@ class Event {
     return Event(
       id: json["id"],
       name: json["name"],
-      date: DateTime.parse(json["date"]), // تحويل String إلى DateTime
+      date: DateTime.parse(json["date"]),
       time: json["time"],
       checkedInCount: json["checkedInCount"] ?? 0,
     );
@@ -27,7 +27,7 @@ class Event {
     return {
       "id": id,
       "name": name,
-      "date": date.toIso8601String(), // تحويل DateTime إلى String عند الإرسال
+      "date": date.toIso8601String(),
       "time": time,
       "checkedInCount": checkedInCount,
     };

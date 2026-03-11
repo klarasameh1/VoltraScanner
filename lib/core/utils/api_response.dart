@@ -1,22 +1,11 @@
+enum Status { success, error, loading }
+
 class ApiResponse<T> {
-  final T? data;
-  final String? error;
-  final bool isSuccess;
+  Status status;
+  T? data;
+  String? message;
 
-  ApiResponse.success(this.data)
-      : error = null,
-        isSuccess = true;
-
-  ApiResponse.error(this.error)
-      : data = null,
-        isSuccess = false;
-
-  @override
-  String toString() {
-    if (isSuccess) {
-      return 'Success: $data';
-    } else {
-      return 'Error: $error';
-    }
-  }
+  ApiResponse.success(this.data) : status = Status.success, message = null;
+  ApiResponse.error(this.message) : status = Status.error, data = null;
+  ApiResponse.loading() : status = Status.loading, data = null, message = null;
 }

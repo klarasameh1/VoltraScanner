@@ -3,9 +3,11 @@ import 'package:event_scanner_app/core/theme/app_colors.dart';
 import 'package:event_scanner_app/core/utils/api_response.dart';
 import 'package:event_scanner_app/features/scanner/data/models/event.dart';
 import 'package:event_scanner_app/features/scanner/data/services/qr_service.dart';
+import 'package:event_scanner_app/providers/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:provider/provider.dart';
 
 class ScannerScreen extends StatefulWidget {
   final Event event;
@@ -32,6 +34,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
     _initAudio();
   }
 
+  /// Preload audio assets for success and failure
   Future<void> _initAudio() async {
     try {
       await audioPlayer.setSource(AssetSource('sounds/success.mp3'));
@@ -41,6 +44,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
     }
   }
 
+  /// Handle scanning and verification of QR token
   Future<void> handleScan(String token) async {
     if (scanned) return;
 
@@ -50,13 +54,13 @@ class _ScannerScreenState extends State<ScannerScreen> {
     });
 
     try {
-      final result = await service.verifyToken(token);
+      final ApiResponse<Map<String, dynamic>> result = await service.verifyToken(token);
 
-      if (result.isSuccess) {
+      if (result.status == Status.success) {
         final data = result.data!;
         bool success = data["status"] == "success";
 
-        // AUDIO
+        // Play audio feedback
         try {
           await audioPlayer.stop();
           await audioPlayer.play(
@@ -70,23 +74,27 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
         setState(() {
           scanSuccess = success;
-          resultMessage = data["message"] ?? (success ? "Success" : "Failed");
+          resultMessage = data["message"] ?? (success ? "Check-in successful" : "Check-in failed");
         });
 
         if (success) {
+          // Increment the event's checked-in count
           widget.event.checkedInCount += 1;
+          // update the provider here
+          context.read<EventProvider>().updateEventCheckedInCount(widget.event.id, widget.event.checkedInCount);
         }
 
-        // WAIT 2 SECONDS
+        // Wait 2 seconds to show result before closing
         await Future.delayed(const Duration(seconds: 2));
 
         if (!mounted) return;
         Navigator.pop(context, widget.event.checkedInCount);
+
       } else {
-        // IN failed case
+        // Failed case
         setState(() {
           scanSuccess = false;
-          resultMessage = result.error!;
+          resultMessage = result.message ?? "Unknown error";
         });
 
         await Future.delayed(const Duration(seconds: 2));
@@ -98,7 +106,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
           isLoading = false;
         });
 
-        await controller.start(); // Rescan
+        await controller.start(); // Restart scanner
       }
     } catch (e) {
       debugPrint("Scan error: $e");
@@ -126,50 +134,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
     }
   }
 
-  /// FOR TESTING
-  // Future<void> _testScan(String token, {bool isSuccess = true}) async {
-  //   if (scanned) return;
-  //
-  //   // محاكاة الـ API
-  //   await Future.delayed(const Duration(seconds: 1));
-  //
-  //   if (isSuccess) {
-  //     widget.event.checkedInCount += 1;
-  //     setState(() {
-  //       scanSuccess = true;
-  //       resultMessage = "Check-in successful (Test)";
-  //     });
-  //   } else {
-  //     setState(() {
-  //       scanSuccess = false;
-  //       resultMessage = "Invalid QR Code (Test)";
-  //     });
-  //   }
-  //
-  //   try {
-  //     await audioPlayer.stop();
-  //     await audioPlayer.play(
-  //       AssetSource(isSuccess ? 'sounds/success.mp3' : 'sounds/failed.mp3'),
-  //     );
-  //   } catch (e) {
-  //     debugPrint('Audio playback error: $e');
-  //   }
-  //
-  //   await Future.delayed(const Duration(seconds: 2));
-  //
-  //   if (!mounted) return;
-  //
-  //   if (isSuccess) {
-  //     Navigator.pop(context, widget.event.checkedInCount);
-  //   } else {
-  //     setState(() {
-  //       scanSuccess = null;
-  //       scanned = false;
-  //     });
-  //   }
-  // }
-  ///-------------------------------------------------------
-
+  /// Reset the scanner to allow rescanning
   void resetScanner() async {
     setState(() {
       scanned = false;
@@ -195,23 +160,10 @@ class _ScannerScreenState extends State<ScannerScreen> {
         foregroundColor: AppColors.yellow,
         centerTitle: true,
         backgroundColor: AppColors.primary,
-        ///TESTING
-        // actions: [
-        //   IconButton(
-        //     icon: const Icon(Icons.check_circle, color: Colors.green),
-        //     onPressed: () => _testScan("123", isSuccess: true),
-        //     tooltip: "Test Success",
-        //   ),
-        //   IconButton(
-        //     icon: const Icon(Icons.cancel, color: Colors.red),
-        //     onPressed: () => _testScan("INVALID", isSuccess: false),
-        //     tooltip: "Test Fail",
-        //   ),
-        // ],
-        ///-------------------------------------------------------
       ),
       body: Stack(
         children: [
+          // QR Camera view
           MobileScanner(
             controller: controller,
             onDetect: (capture) {
@@ -223,23 +175,25 @@ class _ScannerScreenState extends State<ScannerScreen> {
               }
             },
           ),
+
+          // Scanner frame overlay
           Center(
             child: Container(
               width: 250,
               height: 250,
               decoration: BoxDecoration(
-                border: Border.all(color:  AppColors.yellow, width: 4),
+                border: Border.all(color: AppColors.yellow, width: 4),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: isLoading && scanSuccess == null
                   ? const Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.white,
-                ),
+                child: CircularProgressIndicator(color: AppColors.white),
               )
                   : null,
             ),
           ),
+
+          // Scan result overlay
           if (scanSuccess != null) ...[
             Positioned.fill(
               child: BackdropFilter(
@@ -270,9 +224,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        scanSuccess!
-                            ? Icons.check_circle_rounded
-                            : Icons.cancel_rounded,
+                        scanSuccess! ? Icons.check_circle_rounded : Icons.cancel_rounded,
                         size: 100,
                         color: AppColors.white,
                       ),

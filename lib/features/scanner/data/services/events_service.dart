@@ -6,40 +6,16 @@ import 'package:http/http.dart' as http;
 class EventsService {
   Future<ApiResponse<List<Event>>> getUpcomingEvents() async {
     try {
-      // محاكاة API
-      await Future.delayed(const Duration(seconds: 2));
-
-      // بيانات تجريبية
-      final List events = [
-        {
-          "id": 1,
-          "name": "BMB Event",
-          "date": "2026-02-28",
-          "time": "4:00 pm",
-          "checkedInCount": 15
-        },
-        {
-          "id": 2,
-          "name": "Find your Fit",
-          "date": "2026-03-15",
-          "time": "5:00 pm",
-          "checkedInCount": 0
-        },
-      ];
-
-      return ApiResponse.success(
-        events.map((e) => Event.fromJson(e)).toList(),
-      );
-
-      /// REAL Code with API
-      /*
+      //get - return events list
       final response = await http.get(
-        Uri.parse("https://your-api.com/events/upcoming"),
+        Uri.parse("https://node-core-2f9r.vercel.app/api/events/upcoming"),
         headers: {
           'Content-Type': 'application/json',
-          // 'Authorization': 'Bearer $token', // إذا احتجت توثيق
+          'Authorization': 'Bearer YOUR_TOKEN_HERE', // <-- Add your token
         },
       );
+      print("HTTP Status: ${response.statusCode}");
+      print("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final List data = jsonDecode(response.body);
@@ -47,11 +23,8 @@ class EventsService {
           data.map((event) => Event.fromJson(event)).toList(),
         );
       } else {
-        return ApiResponse.error(
-          'Server error: ${response.statusCode}',
-        );
+        return ApiResponse.error('Server error: ${response.statusCode}');
       }
-      */
     } catch (e) {
       return ApiResponse.error(
         'Network error: ${e.toString()}',

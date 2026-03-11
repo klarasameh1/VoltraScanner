@@ -1,47 +1,26 @@
 import 'dart:convert';
-import 'package:event_scanner_app/core/constants/api_constants.dart';
 import 'package:event_scanner_app/core/utils/api_response.dart';
 import 'package:http/http.dart' as http;
 
 class QrService {
   // Dummy data
   Future<ApiResponse<Map<String, dynamic>>> verifyToken(String token) async {
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (token == "123") {
-      return ApiResponse.success({
-        "status": "success",
-        "message": "Check-in successful"
-      });
-    } else {
-      return ApiResponse.error("Invalid QR Code");
-    }
-  }
-
-/// Real Code with API
-/*
-  Future<ApiResponse<Map<String, dynamic>>> verifyToken(String token) async {
     try {
+      // post - to return qr status
       final response = await http.post(
-        Uri.parse("${ApiConstants.baseUrl}${ApiConstants.checkIn}"),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: jsonEncode({
-          "token": token,
-        }),
+        Uri.parse("https://node-core-2f9r.vercel.app/api/events/verify-qr"),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({"qr_code": token}),
       );
 
-      final data = jsonDecode(response.body);
-
       if (response.statusCode == 200) {
-        return ApiResponse.success(data);
+        final data = jsonDecode(response.body);
+        return ApiResponse.success(data); // data: Map<String, dynamic>
       } else {
-        return ApiResponse.error(data['message'] ?? 'Check-in failed');
+        return ApiResponse.error("Server error: ${response.statusCode}");
       }
     } catch (e) {
-      return ApiResponse.error('Network error: ${e.toString()}');
+      return ApiResponse.error("Network error: $e");
     }
   }
-  */
 }

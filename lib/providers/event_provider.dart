@@ -1,6 +1,7 @@
+import 'package:event_scanner_app/features/scanner/data/models/event.dart';
 import 'package:flutter/material.dart';
-import '../features/scanner/data/models/event.dart';
 import '../features/scanner/data/services/events_service.dart';
+import 'package:event_scanner_app/core/utils/api_response.dart';
 
 class EventProvider extends ChangeNotifier {
   final EventsService _eventsService = EventsService();
@@ -45,57 +46,13 @@ class EventProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulate network delay
-      await Future.delayed(const Duration(seconds: 2));
+      final response = await _eventsService.getUpcomingEvents();
 
-      // Dummy data with correct DateTime
-      _events = [
-        Event(
-          id: 1,
-          name: 'BMB Event',
-          date: DateTime.now(),
-          time: '5:00 pm',
-          checkedInCount: 15,
-        ),
-        Event(
-          id: 2,
-          name: 'Find your Fit',
-          date: DateTime(2026, 3, 15),
-          time: '5:00 pm',
-          checkedInCount: 0,
-        ),
-        Event(
-          id: 3,
-          name: 'Coding Competition',
-          date: DateTime(2026, 3, 20),
-          time: '6:30 pm',
-          checkedInCount: 0,
-        ),
-        Event(
-          id: 4,
-          name: 'Tech Meetup',
-          date: DateTime(2026, 3, 25),
-          time: '7:00 pm',
-          checkedInCount: 0,
-        ),
-        Event(
-          id: 5,
-          name: 'Tech Meetup',
-          date: DateTime(2026, 3, 25),
-          time: '7:00 pm',
-          checkedInCount: 0,
-        ),
-        Event(
-          id: 6,
-          name: 'Tech Meetup',
-          date: DateTime(2026, 3, 25),
-          time: '7:00 pm',
-          checkedInCount: 0,
-        ),
-      ];
-
-      // TODO: Replace with API call
-      // _events = await _eventsService.getUpcomingEvents();
+      if (response.status == Status.success) {
+        _events = response.data!;
+      } else {
+        _errorMessage = response.message;
+      }
     } catch (e) {
       _errorMessage = "Failed to load events. Please check your connection.";
     } finally {
