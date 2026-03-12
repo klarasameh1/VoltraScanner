@@ -14,12 +14,15 @@ class Event {
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
+
+    final dateTime = DateTime.parse(json["date"]);
+
     return Event(
-      id: json["id"],
-      name: json["name"],
-      date: DateTime.parse(json["date"]),
-      time: json["time"],
-      checkedInCount: json["checkedInCount"] ?? 0,
+      id: json["event_id"],
+      name: json["title"],
+      date: dateTime,
+      time: "${dateTime.hour}:${dateTime.minute}",
+      checkedInCount: 0,
     );
   }
 
