@@ -4,10 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class QrService {
-
   String get baseUrl {
     if (kIsWeb) {
-      return "/api";
+      return "/api"; //For Netlify proxy
     } else {
       return "https://node-core-1qx9.vercel.app/api";
     }
@@ -16,59 +15,72 @@ class QrService {
   Future<ApiResponse<Map<String, dynamic>>> verifyToken(
       int id, int eventId) async {
     try {
-      print("📡 Sending request to API...");
-      print("📤 Data: id=$id, event_id=$eventId");
 
-      final response = await http.post(
+      if (id <= 0 || eventId <= 0) {
+        return ApiResponse.error("Invalid id or eventId");
+      }
+
+      debugPrint("📡 Sending request...");
+      debugPrint("📤 id=$id, event_id=$eventId");
+
+      final response = await http
+          .post(
         Uri.parse("$baseUrl/events/verify-qr"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "id": id,
           "event_id": eventId,
         }),
-      );
+      )
+          .timeout(const Duration(seconds: 10));
 
-      print("📥 Status Code: ${response.statusCode}");
-      print("📥 Response Body: ${response.body}");
+      debugPrint("📥 Status: ${response.statusCode}");
+      debugPrint("📥 Body: ${response.body}");
 
       if (response.body.isEmpty) {
-        return ApiResponse.error('Empty response from server');
+        return ApiResponse.error("Empty response from server");
       }
 
-      final Map<String, dynamic> data = jsonDecode(response.body);
+      // Safe JSON parsing
+      Map<String, dynamic> data;
+      try {
+        data = jsonDecode(response.body);
+      } catch (e) {
+        return ApiResponse.error("Invalid JSON response");
+      }
 
+      // Status Code
       if (response.statusCode == 200 || response.statusCode == 201) {
-
-        bool isSuccess = data["success"] == true ||
-            data["status"] == "success" ||
-            data["statusCode"] == 200 ||
-            (data["data"] != null &&
-                (data["data"]["success"] == true ||
-                    data["data"]["status"] == "success")) ||
-            response.statusCode == 200; // fallback للـ status code
+        bool isSuccess =
+            data["success"] == true ||
+                data["status"] == "success" ||
+                data["statusCode"] == 200 ||
+                (data["data"] is Map &&
+                    (data["data"]["success"] == true ||
+                        data["data"]["status"] == "success"));
 
         if (isSuccess) {
-          print("✅ API call successful!");
+          debugPrint("✅ Success");
           return ApiResponse.success(data);
         } else {
           String errorMsg = data["message"] ??
               data["msg"] ??
               data["error"] ??
               "Check-in failed";
+
           return ApiResponse.error(errorMsg);
         }
       } else {
-        // HTTP error
         String errorMsg = data["message"] ??
             data["msg"] ??
             data["error"] ??
             "Server error: ${response.statusCode}";
+
         return ApiResponse.error(errorMsg);
       }
-
     } catch (e) {
-      print("💥 Network error: $e");
-      return ApiResponse.error('Network error: $e');
+      debugPrint("💥 Error: $e");
+      return ApiResponse.error("Network error: $e");
     }
   }
 }
