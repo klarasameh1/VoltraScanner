@@ -115,7 +115,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
       if (!mounted) return;
       setState(() {
         scanSuccess = false;
-        resultMessage = "Error: Invalid QR or network issue";
+        resultMessage = "Invalid QR \n or network issue";
         isLoading = false;
       });
 
