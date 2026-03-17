@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const CustomAppBar(userName: 'Voltra Scanner'),
                 const SizedBox(height: 24),
 
-                // Today Events Section - الهيدر دايماً موجود
+                // Today Events Header
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 12),
 
-                      // محتوى أحداث اليوم
+                      //Today Events
                       Consumer<EventProvider>(
                         builder: (context, provider, _) {
                           if (provider.isLoading && provider.events.isEmpty) {
@@ -123,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 const SizedBox(height: 24),
 
-                // Coming Events Section - الهيدر دايماً موجود
+                // Coming Events header
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
@@ -179,14 +179,27 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: EventCard(
                                 event: event,
                                 isToday: false,
-                                onScan: null,
+                                onScan: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ScannerScreen(event: event),
+                                    ),
+                                  );
+                                },
                               ),
                             )).toList(),
                           );
                         },
                       ),
 
-                      const SizedBox(height: 20), // مسافة في النهاية
+                      const SizedBox(height: 10),
+                      const Center(
+                        child:Text(
+                          "© 2026 Alx Voltra"
+                        )
+                      ),
+                      const SizedBox(height: 10),
                     ],
                   ),
                 ),
