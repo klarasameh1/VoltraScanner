@@ -1,0 +1,5 @@
+[[redirects]]
+    from = "/api/*"
+    to = "https://node-core-1qx9.vercel.app/api/:splat"
+    status = 200
+    force = true

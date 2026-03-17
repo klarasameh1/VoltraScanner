@@ -9,7 +9,7 @@ class EventsService {
 
     try {
       final response = await http.get(
-        Uri.parse("https://node-core-1qx9.vercel.app/api/events/upcoming"),
+        Uri.parse("/api/events/upcoming"),
       );
 
       //debug

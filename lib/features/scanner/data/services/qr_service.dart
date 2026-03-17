@@ -10,7 +10,7 @@ class QrService {
       print("📤 Data: id=$id, event_id=$eventId");
 
       final response = await http.post(
-        Uri.parse("https://node-core-1qx9.vercel.app/api/events/verify-qr"),
+        Uri.parse("/api/events/verify-qr"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "id": id,
