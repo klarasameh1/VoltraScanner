@@ -80,7 +80,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
         setState(() {
           scanSuccess = success;
-          resultMessage = message;  // استخدمي message هنا
+          resultMessage = message;
           isLoading = false;
         });
 
@@ -93,30 +93,28 @@ class _ScannerScreenState extends State<ScannerScreen> {
         await Future.delayed(const Duration(seconds: 2));
         if (!mounted) return;
 
-        // ارجعي للصفحة السابقة بعد 2 ثانية
         Navigator.pop(context, widget.event.checkedInCount);
 
       } else {
-        // حالة الفشل من API
+
         if (!mounted) return;
         setState(() {
-          scanSuccess = false;  // ← هنا لازم false مش null
+          scanSuccess = false;
           resultMessage = result.message ?? "Check-in failed";
           isLoading = false;
         });
 
         await audioPlayer.playFeedback(false);
 
-        // ما ترجعيش null وتخلي الـ overlay يظهر
         await Future.delayed(const Duration(seconds: 2));
         if (!mounted) return;
-        resetScanner();  // ارجعي المسح بعد 2 ثانية
+        resetScanner();
       }
     } catch (e) {
-      // خطأ في الاتصال أو JSON
+      // failed in connect or json
       if (!mounted) return;
       setState(() {
-        scanSuccess = false;  // ← هنا كمان false
+        scanSuccess = false;
         resultMessage = "Error: Invalid QR or network issue";
         isLoading = false;
       });

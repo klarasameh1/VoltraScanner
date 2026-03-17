@@ -13,8 +13,8 @@ class EventsService {
       );
 
       //debug
-      // print("Status Code: ${response.statusCode}");
-      // print("Response Body: ${response.body}");
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
 
