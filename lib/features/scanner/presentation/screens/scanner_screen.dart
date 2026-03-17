@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:event_scanner_app/features/scanner/presentation/widgets/scanner_audio.dart';
+import 'dart:convert';
 
 class ScannerScreen extends StatefulWidget {
   final Event event;
@@ -36,7 +37,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
   }
 
   /// Handle scanning and verification of QR token
-  Future<void> handleScan(String token) async {
+  Future<void> handleScan(String qrData) async {
     if (scanned) return;
 
     setState(() {
@@ -46,8 +47,18 @@ class _ScannerScreenState extends State<ScannerScreen> {
     });
 
     try {
+      print("QR DATA: $qrData");
+
+      final decoded = jsonDecode(qrData);
+
+      print("USER ID: ${decoded["id"]}");
+      print("EVENT ID: ${decoded["event_id"]}");
+
+      final int userId = decoded["id"];
+      final int eventId = decoded["event_id"];
+
       final ApiResponse<Map<String, dynamic>> result =
-          await service.verifyToken(token);
+      await service.verifyToken(userId, eventId);
 
       if (result.status == Status.success) {
         final data = result.data!;
@@ -61,20 +72,19 @@ class _ScannerScreenState extends State<ScannerScreen> {
             data["msg"] ??
             data["data"]?["message"] ??
             (success ? "Check-in successful" : "Check-in failed");
-        resultMessage = message; // تحديث المتغير
 
         // Play audio feedback
         await audioPlayer.playFeedback(success);
 
         if (!mounted) return;
+
         setState(() {
           scanSuccess = success;
-          resultMessage = data["message"] ??
-              (success ? "Check-in successful" : "Check-in failed");
+          resultMessage = message;  // استخدمي message هنا
+          isLoading = false;
         });
 
         if (success) {
-          // Increment the event's checked-in count
           widget.event.checkedInCount += 1;
           context.read<EventProvider>().updateEventCheckedInCount(
               widget.event.id, widget.event.checkedInCount);
@@ -82,43 +92,41 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
         await Future.delayed(const Duration(seconds: 2));
         if (!mounted) return;
+
+        // ارجعي للصفحة السابقة بعد 2 ثانية
         Navigator.pop(context, widget.event.checkedInCount);
+
       } else {
-        handleScanFailure(result.message ?? "Unknown error");
+        // حالة الفشل من API
+        if (!mounted) return;
+        setState(() {
+          scanSuccess = false;  // ← هنا لازم false مش null
+          resultMessage = result.message ?? "Check-in failed";
+          isLoading = false;
+        });
+
+        await audioPlayer.playFeedback(false);
+
+        // ما ترجعيش null وتخلي الـ overlay يظهر
+        await Future.delayed(const Duration(seconds: 2));
+        if (!mounted) return;
+        resetScanner();  // ارجعي المسح بعد 2 ثانية
       }
     } catch (e) {
-      handleScanFailure("Error scanning QR");
-    } finally {
-      if (mounted) {
-        // تأكد من إيقاف التحميل فقط إذا لم يظهر overlay
-        if (scanSuccess == null) {
-          setState(() {
-            isLoading = false;
-          });
-        }
-      }
-    }
-  }
-
-  void handleScanFailure(String message) async {
-    if (mounted) {
+      // خطأ في الاتصال أو JSON
+      if (!mounted) return;
       setState(() {
-        scanSuccess = null;
-        scanned = false;
+        scanSuccess = false;  // ← هنا كمان false
+        resultMessage = "Error: Invalid QR or network issue";
         isLoading = false;
       });
+
+      await audioPlayer.playFeedback(false);
+
+      await Future.delayed(const Duration(seconds: 2));
+      if (!mounted) return;
+      resetScanner();
     }
-
-    await Future.delayed(const Duration(seconds: 2));
-    if (!mounted) return;
-
-    setState(() {
-      scanSuccess = null;
-      scanned = false;
-      isLoading = false;
-    });
-
-    await controller.start();
   }
 
   /// Reset the scanner to allow rescanning
@@ -170,8 +178,10 @@ class _ScannerScreenState extends State<ScannerScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
-        onPressed: resetScanner,
-        child: const Icon(Icons.refresh, color: AppColors.yellow),
+        onPressed: () {
+          handleScan('{"id":123,"event_id":1}');
+        },
+        child: const Icon(Icons.play_arrow, color: AppColors.yellow),
       ),
     );
   }
