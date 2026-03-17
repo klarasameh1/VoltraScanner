@@ -149,7 +149,7 @@ class EventCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                   decoration: BoxDecoration(
                     color: AppColors.yellow,
                     borderRadius: BorderRadius.circular(20),
@@ -157,8 +157,8 @@ class EventCard extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.person, color: AppColors.primary, size: 18),
-                      const SizedBox(width: 6),
+                      const Icon(Icons.person, color: AppColors.primary, size: 20),
+                      const SizedBox(width: 8),
                       Text(
                         event.checkedInCount.toString(),
                         style: const TextStyle(
@@ -170,23 +170,26 @@ class EventCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                SizedBox(width: 8,),
                 if (onScan != null)
-                  ElevatedButton(
-                    onPressed: onScan,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.yellow,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: onScan,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.yellow,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
-                    ),
-                    child: const Text(
-                      "Start Scanning",
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        letterSpacing: 0.3,
+                      child: const Text(
+                        "Start Scanning",
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          letterSpacing: 0.3,
+                        ),
                       ),
                     ),
                   ),
