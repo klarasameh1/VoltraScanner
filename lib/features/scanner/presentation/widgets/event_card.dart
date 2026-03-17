@@ -136,7 +136,7 @@ class EventCard extends StatelessWidget {
           ],
 
           // Scan button for Today only
-          if (showToday && onScan != null) ...[
+
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
@@ -160,7 +160,7 @@ class EventCard extends StatelessWidget {
                 ),
               ),
             ),
-          ],
+
         ],
       ),
     );
