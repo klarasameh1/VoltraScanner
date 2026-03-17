@@ -8,7 +8,7 @@ class EventsService {
 
   String get baseUrl {
     if (kIsWeb) {
-      return "/api";
+      return "https://node-core-1qx9.vercel.app/api";
     } else {
       return "https://node-core-1qx9.vercel.app/api";
     }
