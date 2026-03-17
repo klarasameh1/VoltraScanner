@@ -7,7 +7,7 @@ class QrService {
 
   String get baseUrl {
     if (kIsWeb) {
-      return "https://node-core-1qx9.vercel.app/api";
+      return "/api";
     } else {
       return "https://node-core-1qx9.vercel.app/api";
     }
