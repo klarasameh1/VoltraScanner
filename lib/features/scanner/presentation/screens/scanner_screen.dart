@@ -39,6 +39,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
   /// Handle scanning and verification of QR token
   Future<void> handleScan(String qrData) async {
     if (scanned) return;
+    debugPrint("🔍 RAW QR: $qrData");
+    debugPrint("🔍 QR TYPE: ${qrData.runtimeType}");
 
     setState(() {
       isLoading = true;
@@ -51,8 +53,10 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
       final decoded = jsonDecode(qrData);
 
-      print("USER ID: ${decoded["id"]}");
-      print("EVENT ID: ${decoded["event_id"]}");
+      debugPrint("DECODED: $decoded");
+      debugPrint("USER ID: ${decoded["id"]}");
+      debugPrint("EVENT ID: ${decoded["event_id"]}");
+      debugPrint("TYPE event_id: ${decoded["event_id"].runtimeType}");
 
       final int userId = decoded["id"];
       final int eventId = decoded["event_id"];
