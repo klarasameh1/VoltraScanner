@@ -19,7 +19,6 @@ class EventCard extends StatelessWidget {
     final DateTime eventDate = event.date;
     final DateTime today = DateTime.now();
 
-    // Determine if this event is Today
     bool showToday = isToday ||
         (eventDate.year == today.year &&
             eventDate.month == today.month &&
@@ -42,24 +41,36 @@ class EventCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Event title + Today indicator
+          if (event.photos.isNotEmpty) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                event.photos.first,
+                height: 150,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const SizedBox(),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Text(
                   event.name,
                   style: const TextStyle(
-                    fontSize: 22,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: AppColors.white,
-                    letterSpacing: 0.5,
                   ),
                 ),
               ),
               if (showToday)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     color: AppColors.accentGreen,
                     borderRadius: BorderRadius.circular(15),
@@ -78,25 +89,19 @@ class EventCard extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // Event date & time (always visible)
+          //Date and Time
           Row(
             children: [
-              const Icon(
-                Icons.calendar_today,
-                size: 18,
-                color: AppColors.yellow,
-              ),
+              const Icon(Icons.calendar_today, size: 18, color: AppColors.yellow),
               const SizedBox(width: 6),
-              Text(
-                "${eventDate.day}/${eventDate.month}/${eventDate.year}",
-                style: const TextStyle(color: Colors.white70),
+              Expanded(
+                child: Text(
+                  "${eventDate.day}/${eventDate.month}/${eventDate.year}",
+                  style: const TextStyle(color: Colors.white70),
+                ),
               ),
               const SizedBox(width: 20),
-              const Icon(
-                Icons.access_time_rounded,
-                size: 18,
-                color: AppColors.yellow,
-              ),
+              const Icon(Icons.access_time_rounded, size: 18, color: AppColors.yellow),
               const SizedBox(width: 6),
               Text(
                 event.time,
@@ -105,62 +110,89 @@ class EventCard extends StatelessWidget {
             ],
           ),
 
-          // Only show check-in count for Today
-          if (showToday) ...[
+          const SizedBox(height: 8),
+
+          //Type and Category
+          Row(
+            children: [
+              Icon(event.type == "online" ? Icons.videocam : Icons.location_city,
+                  size: 18, color: AppColors.yellow),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  event.type,
+                  style: const TextStyle(color: Colors.white70),
+                ),
+              ),
+
+              const Icon(Icons.people, size: 18, color: AppColors.yellow),
+              const SizedBox(width: 6),
+              Text(
+                event.category,
+                style: const TextStyle(color: Colors.white70),
+                overflow: TextOverflow.ellipsis,
+
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 8),
+
+
+
+
+
+          //Counter and Scanner "only if toady and offline"
+          if (showToday & !(event.type == "online")) ...[
             const SizedBox(height: 16),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(
-                  Icons.person,
-                  color: AppColors.yellow,
-                ),
-                const SizedBox(width: 6),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
                     color: AppColors.yellow,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(
-                    event.checkedInCount.toString(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.person, color: AppColors.primary, size: 18),
+                      const SizedBox(width: 6),
+                      Text(
+                        event.checkedInCount.toString(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+                if (onScan != null)
+                  ElevatedButton(
+                    onPressed: onScan,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.yellow,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+                    ),
+                    child: const Text(
+                      "Start Scanning",
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ],
-
-          // Scan button for Today only
-
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: onScan,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.yellow,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                child: const Text(
-                  "Start Scanning",
-                  style: TextStyle(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-              ),
-            ),
-
         ],
       ),
     );
