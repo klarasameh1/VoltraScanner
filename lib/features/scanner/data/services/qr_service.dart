@@ -1,8 +1,17 @@
 import 'dart:convert';
 import 'package:event_scanner_app/core/utils/api_response.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class QrService {
+
+  String get baseUrl {
+    if (kIsWeb) {
+      return "/api";
+    } else {
+      return "https://node-core-1qx9.vercel.app/api";
+    }
+  }
   Future<ApiResponse<Map<String, dynamic>>> verifyToken(
       int id, int eventId) async {
     try {
@@ -10,7 +19,7 @@ class QrService {
       print("📤 Data: id=$id, event_id=$eventId");
 
       final response = await http.post(
-        Uri.parse("/api/events/verify-qr"),
+        Uri.parse("$baseUrl/events/verify-qr"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "id": id,

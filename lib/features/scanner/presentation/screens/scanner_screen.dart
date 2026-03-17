@@ -175,11 +175,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary,
-        onPressed: () {
-          handleScan('{"id":123,"event_id":1}');
-        },
-        child: const Icon(Icons.play_arrow, color: AppColors.yellow),
+        backgroundColor: const Color(0x800053C8),
+        onPressed: resetScanner,
+        child: const Icon(Icons.refresh , color: AppColors.yellow,),
       ),
     );
   }

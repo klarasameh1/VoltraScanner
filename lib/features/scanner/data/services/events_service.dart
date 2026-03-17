@@ -1,15 +1,23 @@
 import 'dart:convert';
 import 'package:event_scanner_app/core/utils/api_response.dart';
 import 'package:event_scanner_app/features/scanner/data/models/event.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class EventsService {
 
+  String get baseUrl {
+    if (kIsWeb) {
+      return "/api";
+    } else {
+      return "https://node-core-1qx9.vercel.app/api";
+    }
+  }
   Future<ApiResponse<List<Event>>> getUpcomingEvents() async {
 
     try {
       final response = await http.get(
-        Uri.parse("/api/events/upcoming"),
+        Uri.parse("$baseUrl/events/upcoming"),
       );
 
       //debug
