@@ -2,31 +2,44 @@ import 'package:event_scanner_app/features/scanner/data/models/event.dart';
 import 'package:flutter/material.dart';
 import '../features/scanner/data/services/events_service.dart';
 import 'package:event_scanner_app/core/utils/api_response.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EventProvider extends ChangeNotifier {
   final EventsService _eventsService = EventsService();
+  SharedPreferences? _prefs;
+
   List<Event> _events = [];
   bool _isLoading = false;
   String? _errorMessage;
-  final Map<int, int> _checkedInCache = {};
 
-  List<Event> get events => _events.map((e) {
-    final cached = _checkedInCache[e.id];
-    return cached != null ? e.copyWith(checkedInCount: cached) : e;
-  }).toList();
-
-  void updateEventCheckedInCount(int eventId, int newCount) {
-    _checkedInCache[eventId] = newCount;
-    notifyListeners();
+  EventProvider() {
+    _initPrefs();
   }
-  // Getters
+
+  Future<void> _initPrefs() async {
+    _prefs = await SharedPreferences.getInstance();
+    // بعد ما الـ prefs يجهز، جيب الأحداث
+    fetchEvents();
+  }
+
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  /// Today's events
+  List<Event> get events {
+    if (_prefs == null) return _events;
+
+    return _events.map((event) {
+      final savedCount = _prefs!.getInt('checked_${event.id}');
+      if (savedCount != null) {
+        event.checkedInCount = savedCount;
+      }
+      return event;
+    }).toList();
+  }
+
   List<Event> get todayEvents {
     final now = DateTime.now();
-    return _events.where((event) {
+    return events.where((event) {
       final eventDate = event.date;
       return eventDate.year == now.year &&
           eventDate.month == now.month &&
@@ -34,18 +47,15 @@ class EventProvider extends ChangeNotifier {
     }).toList();
   }
 
-  /// Upcoming events after today
   List<Event> get futureEvents {
     final now = DateTime.now();
     final todayEnd = DateTime(now.year, now.month, now.day, 23, 59, 59);
-
-    return _events.where((event) {
+    return events.where((event) {
       final eventDate = event.date;
       return eventDate.isAfter(todayEnd);
     }).toList();
   }
 
-  /// Fetch events (dummy data for now)
   Future<void> fetchEvents() async {
     _isLoading = true;
     _errorMessage = null;
@@ -56,6 +66,17 @@ class EventProvider extends ChangeNotifier {
 
       if (response.status == Status.success) {
         _events = response.data!;
+
+        if (_prefs != null) {
+          for (var event in _events) {
+            final savedCount = _prefs!.getInt('checked_${event.id}');
+            if (savedCount != null) {
+              event.checkedInCount = savedCount;
+            }
+          }
+        }
+
+        notifyListeners();
       } else {
         _errorMessage = response.message;
       }
@@ -65,5 +86,18 @@ class EventProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void updateEventCheckedInCount(int eventId, int newCount) async {
+    if (_prefs == null) return;
+
+    await _prefs!.setInt('checked_$eventId', newCount);
+
+    final index = _events.indexWhere((event) => event.id == eventId);
+    if (index != -1) {
+      _events[index].checkedInCount = newCount;
+    }
+
+    notifyListeners();
   }
 }

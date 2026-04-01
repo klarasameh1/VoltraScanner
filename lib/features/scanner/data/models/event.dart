@@ -9,7 +9,7 @@ class Event {
   final String category;
   final List<Speaker> speakers;
   final List<String> photos;
-  int checkedInCount;
+  int checkedInCount; // من غير final
 
   Event({
     required this.id,
