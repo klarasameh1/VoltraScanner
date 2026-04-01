@@ -143,7 +143,7 @@ class EventCard extends StatelessWidget {
 
 
           //Counter and Scanner "only if toady and offline"
-          if (showToday & !(event.type == "online")) ...[
+          // if (showToday & !(event.type == "online")) ...[
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -196,7 +196,7 @@ class EventCard extends StatelessWidget {
               ],
             ),
           ],
-        ],
+        // ],
       ),
     );
   }

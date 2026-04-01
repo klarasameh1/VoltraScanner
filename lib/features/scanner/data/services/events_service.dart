@@ -17,7 +17,7 @@ class EventsService {
 
     try {
       final response = await http.get(
-        Uri.parse("$baseUrl/events/upcoming"),
+        Uri.parse("$baseUrl/events/upcomingEventsApp"),
       );
 
       //debug

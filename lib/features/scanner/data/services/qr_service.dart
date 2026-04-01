@@ -12,24 +12,22 @@ class QrService {
     }
   }
 
-  Future<ApiResponse<Map<String, dynamic>>> verifyToken(
-      int id, int eventId) async {
+  // Modified: now accepts a single token parameter
+  Future<ApiResponse<Map<String, dynamic>>> verifyToken(String token) async {
     try {
-
-      if (id <= 0 || eventId <= 0) {
-        return ApiResponse.error("Invalid id or eventId");
+      if (token.isEmpty) {
+        return ApiResponse.error("Invalid token");
       }
 
       debugPrint("📡 Sending request...");
-      debugPrint("📤 id=$id, event_id=$eventId");
+      debugPrint("📤 token=$token");
 
       final response = await http
           .post(
         Uri.parse("$baseUrl/events/verify-qr"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          "id": id,
-          "event_id": eventId,
+          "qrData": token, // Send only token
         }),
       )
           .timeout(const Duration(seconds: 10));

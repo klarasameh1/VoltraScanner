@@ -26,13 +26,18 @@ class Event {
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
-    final dateTime = DateTime.parse(json["date"]);
+    DateTime dateTime;
+    try {
+      dateTime = DateTime.parse(json["date"]);
+    } catch (e) {
+      dateTime = DateTime.now();
+    }
 
     return Event(
       id: json["event_id"],
       name: json["title"],
       date: dateTime,
-      time: "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}",
+      time: _formatTime(dateTime),
       city: json["city"] ?? "N/A",
       description: json["description"] ?? "",
       type: json["type"] ?? "offline",
@@ -41,8 +46,17 @@ class Event {
           ?.map((s) => Speaker.fromJson(s))
           .toList() ?? [],
       photos: (json["photos"] as List?)?.cast<String>() ?? [],
-      checkedInCount: 0,
+      checkedInCount: json["checkedInCount"] ?? 0,
     );
+  }
+
+  static String _formatTime(DateTime dateTime) {
+    int hour = dateTime.hour;
+    int minute = dateTime.minute;
+    String period = hour >= 12 ? 'PM' : 'AM';
+    int hour12 = hour % 12;
+    hour12 = hour12 == 0 ? 12 : hour12;
+    return '$hour12:${minute.toString().padLeft(2, '0')} $period';
   }
 
   Map<String, dynamic> toJson() {
