@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
+  // Brand Colors
+  static const primaryDark = Color(0xFF090613);
+  static const primaryBlue = Color(0xFF101828);
+  static const secondaryBlue = Color(0xFF4A7AFF);
+  static const accentYellow = Color(0xFFfbd437);
 
-  /// Primary
-  static const primary = Color(0xFF002B56);
-  static const accentGreen = Color(0xFF05F283);
-  static const purple = Color(0xFF5647B6);
+  // UI Colors
+  static const background = Color(0xFF0A0C10);
+  static const card = Color(0xFF111317);
   static const white = Color(0xFFFFFFFF);
+  static const textPrimary = Color(0xFFFFFFFF);
+  static const textSecondary = Color(0xFF9CA3AF);
 
-  /// Secondary
-  static const cyan = Color(0xFF27DEF2);
-  static const yellow = Color(0xFFFBD437);
-  static const red = Color(0xFFFF4747);
-  static const blue = Color(0xFF008ECA);
-  static const teal = Color(0xFF41C9B9);
+  // Status Colors
+  static const success = Color(0xFF10B981);
+  static const error = Color(0xFFEF4444);
+  static const warning = Color(0xFFF59E0B);
 
-  /// UI helpers
-  static const background = Color(0xFFF7F9FC);
-  static const card = Colors.white;
-  static const textPrimary = Color(0xFF1A1A1A);
-  static const textSecondary = Color(0xFF6B7280);
+  // Keep these for compatibility if needed, but you can remove or replace them
+  static const primary = primaryBlue;
+  static const accentGreen = Color(0xff1e9287);
 }

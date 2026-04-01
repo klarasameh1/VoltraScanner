@@ -14,7 +14,7 @@ class ScannerFrame extends StatelessWidget {
         width: 250,
         height: 250,
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.yellow, width: 4),
+          border: Border.all(color: AppColors.accentYellow, width: 4),
           borderRadius: BorderRadius.circular(20),
         ),
         child: isLoading && scanSuccess == null

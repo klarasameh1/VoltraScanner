@@ -35,7 +35,7 @@ class ResultOverlay extends StatelessWidget {
               width: 300,
               padding: const EdgeInsets.all(30),
               decoration: BoxDecoration(
-                color: success ? AppColors.accentGreen : AppColors.red,
+                color: success ? AppColors.success : AppColors.error,
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
@@ -69,7 +69,7 @@ class ResultOverlay extends StatelessWidget {
                       onPressed: onRetry,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.white,
-                        foregroundColor: AppColors.red,
+                        foregroundColor: AppColors.error,
                       ),
                       child: const Text('Try Again'),
                     ),

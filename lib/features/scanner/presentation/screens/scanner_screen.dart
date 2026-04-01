@@ -165,7 +165,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text("Scanner"),
-        foregroundColor: AppColors.yellow,
+        foregroundColor: AppColors.accentYellow,
         centerTitle: true,
         backgroundColor: AppColors.primary,
       ),

@@ -28,7 +28,7 @@ class EventCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: AppColors.primaryBlue,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -92,7 +92,7 @@ class EventCard extends StatelessWidget {
           //Date and Time
           Row(
             children: [
-              const Icon(Icons.calendar_today, size: 18, color: AppColors.yellow),
+              const Icon(Icons.calendar_today, size: 18, color: AppColors.accentYellow),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -101,7 +101,7 @@ class EventCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 20),
-              const Icon(Icons.access_time_rounded, size: 18, color: AppColors.yellow),
+              const Icon(Icons.access_time_rounded, size: 18, color: AppColors.accentYellow),
               const SizedBox(width: 6),
               Text(
                 event.time,
@@ -116,7 +116,7 @@ class EventCard extends StatelessWidget {
           Row(
             children: [
               Icon(event.type == "online" ? Icons.videocam : Icons.location_city,
-                  size: 18, color: AppColors.yellow),
+                  size: 18, color: AppColors.accentYellow),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -125,7 +125,7 @@ class EventCard extends StatelessWidget {
                 ),
               ),
 
-              const Icon(Icons.people, size: 18, color: AppColors.yellow),
+              const Icon(Icons.people, size: 18, color: AppColors.accentYellow),
               const SizedBox(width: 6),
               Text(
                 event.category,
@@ -151,19 +151,19 @@ class EventCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                   decoration: BoxDecoration(
-                    color: AppColors.yellow,
+                    color: AppColors.accentGreen,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.person, color: AppColors.primary, size: 20),
+                      const Icon(Icons.person, color: AppColors.textPrimary, size: 20),
                       const SizedBox(width: 8),
                       Text(
                         event.checkedInCount.toString(),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                          color: AppColors.textPrimary,
                           fontSize: 16,
                         ),
                       ),
@@ -176,7 +176,7 @@ class EventCard extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: onScan,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.yellow,
+                        backgroundColor: AppColors.accentGreen,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20)
                         ),
