@@ -27,8 +27,21 @@ class Event {
 
   factory Event.fromJson(Map<String, dynamic> json) {
     DateTime dateTime;
+
     try {
-      dateTime = DateTime.parse(json["date"]);
+      String date = json["date"];
+      String? time = json["time"];
+
+      if (time != null) {
+
+        String dateOnly = date.split("T")[0];
+
+        dateTime = DateTime.parse("$dateOnly $time");
+      } else {
+        dateTime = DateTime.parse(date);
+      }
+
+      dateTime = dateTime.toLocal(); // important for timezone
     } catch (e) {
       dateTime = DateTime.now();
     }
@@ -46,7 +59,7 @@ class Event {
           ?.map((s) => Speaker.fromJson(s))
           .toList() ?? [],
       photos: (json["photos"] as List?)?.cast<String>() ?? [],
-      checkedInCount: json["checkedInCount"] ?? 0,
+      checkedInCount: json["checkedInCount"] ,
     );
   }
 

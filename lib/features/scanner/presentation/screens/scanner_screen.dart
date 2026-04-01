@@ -193,9 +193,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           FloatingActionButton(
-            backgroundColor: const Color(0x800053C8),
+            backgroundColor: AppColors.primaryBlue,
             onPressed: resetScanner,
-            child: const Icon(Icons.refresh),
+            child: const Icon(Icons.refresh , color: AppColors.accentYellow,),
           ),
           const SizedBox(height: 10),
         ],
