@@ -5,15 +5,23 @@ import 'package:event_scanner_app/core/utils/api_response.dart';
 
 class EventProvider extends ChangeNotifier {
   final EventsService _eventsService = EventsService();
-
   List<Event> _events = [];
   bool _isLoading = false;
   String? _errorMessage;
+  final Map<int, int> _checkedInCache = {};
 
+  List<Event> get events => _events.map((e) {
+    final cached = _checkedInCache[e.id];
+    return cached != null ? e.copyWith(checkedInCount: cached) : e;
+  }).toList();
+
+  void updateEventCheckedInCount(int eventId, int newCount) {
+    _checkedInCache[eventId] = newCount;
+    notifyListeners();
+  }
   // Getters
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
-  List<Event> get events => _events;
 
   /// Today's events
   List<Event> get todayEvents {
@@ -55,15 +63,6 @@ class EventProvider extends ChangeNotifier {
       _errorMessage = "Failed to load events. Please check your connection.";
     } finally {
       _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  /// Update checked-in count for an event
-  void updateEventCheckedInCount(int eventId, int newCount) {
-    final index = _events.indexWhere((event) => event.id == eventId);
-    if (index != -1) {
-      _events[index] = _events[index].copyWith(checkedInCount: newCount);
       notifyListeners();
     }
   }

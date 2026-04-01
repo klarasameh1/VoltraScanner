@@ -59,7 +59,7 @@ class Event {
           ?.map((s) => Speaker.fromJson(s))
           .toList() ?? [],
       photos: (json["photos"] as List?)?.cast<String>() ?? [],
-      checkedInCount: json["checkedInCount"] ,
+      checkedInCount: json["checkedInCount"] ?? 0,
     );
   }
 
